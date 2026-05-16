@@ -9,6 +9,33 @@ const { ensureAuthenticated } = require('../middleware/auth');
 
 const upload = multer({ dest: path.join(__dirname, '../public/uploads/') });
 
+// 半形轉全形、全形轉半形，產生兩種版本的 regex
+function toFullWidth(str) {
+  return str.replace(/[0-9]/g, c => String.fromCharCode(c.charCodeAt(0) + 0xFEE0));
+}
+function toHalfWidth(str) {
+  return str.replace(/[\uFF10-\uFF19]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+}
+function buildSearchRegex(term) {
+  // Build a regex that matches both half-width and full-width digits
+  let pattern = '';
+  for (const ch of term) {
+    const code = ch.charCodeAt(0);
+    if (code >= 0x30 && code <= 0x39) {
+      // half-width digit -> match both
+      const fw = String.fromCharCode(code + 0xFEE0);
+      pattern += `[${ch}${fw}]`;
+    } else if (code >= 0xFF10 && code <= 0xFF19) {
+      // full-width digit -> match both
+      const hw = String.fromCharCode(code - 0xFEE0);
+      pattern += `[${hw}${ch}]`;
+    } else {
+      pattern += ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+  }
+  return pattern;
+}
+
 // 客戶列表
 router.get('/', ensureAuthenticated, async (req, res) => {
   const search = req.query.search || '';
@@ -17,11 +44,13 @@ router.get('/', ensureAuthenticated, async (req, res) => {
 
   const query = {};
   if (search) {
+    const searchPattern = buildSearchRegex(search);
     query.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { contactPerson: { $regex: search, $options: 'i' } },
-      { address: { $regex: search, $options: 'i' } },
-      { institutionCode: { $regex: search, $options: 'i' } },
+      { name: { $regex: searchPattern, $options: 'i' } },
+      { contactPerson: { $regex: searchPattern, $options: 'i' } },
+      { address: { $regex: searchPattern, $options: 'i' } },
+      { institutionCode: { $regex: searchPattern, $options: 'i' } },
+      { owner: { $regex: searchPattern, $options: 'i' } },
     ];
   }
   if (cityFilter) query.city = cityFilter;
