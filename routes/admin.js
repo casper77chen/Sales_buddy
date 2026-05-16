@@ -10,6 +10,13 @@ router.get('/', ensureAuthenticated, ensureAdmin, async (req, res) => {
   res.render('admin/users', { users, managers });
 });
 
+// 審核使用者（核准）
+router.put('/users/:id/approve', ensureAuthenticated, ensureAdmin, async (req, res) => {
+  await User.findByIdAndUpdate(req.params.id, { isApproved: true });
+  req.flash('success_msg', '使用者已核准');
+  res.redirect('/admin');
+});
+
 // 更新使用者角色 / 指派主管
 router.put('/users/:id', ensureAuthenticated, ensureAdmin, async (req, res) => {
   const { role, manager } = req.body;

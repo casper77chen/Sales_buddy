@@ -14,6 +14,9 @@ module.exports = function (passport) {
         if (!isMatch) {
           return done(null, false, { message: '密碼錯誤' });
         }
+        if (!user.isApproved) {
+          return done(null, false, { message: '帳號尚未通過審核，請等待 Admin 核准' });
+        }
         return done(null, user);
       } catch (err) {
         return done(err);

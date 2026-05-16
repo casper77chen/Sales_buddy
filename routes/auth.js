@@ -56,13 +56,14 @@ router.post('/register', async (req, res) => {
 
     // Admin 角色由 ADMIN_EMAIL 決定，其餘依選擇
     let userRole = role === 'manager' ? 'manager' : 'sales';
-    if (email === process.env.ADMIN_EMAIL) {
+    const isAdmin = email === process.env.ADMIN_EMAIL;
+    if (isAdmin) {
       userRole = 'admin';
     }
 
-    await User.create({ name, email, password: hash, role: userRole });
+    await User.create({ name, email, password: hash, role: userRole, isApproved: isAdmin });
 
-    req.flash('success_msg', '註冊成功，請登入');
+    req.flash('success_msg', isAdmin ? '註冊成功，請登入' : '註冊成功！請等待 Admin 審核通過後即可登入');
     res.redirect('/auth/login');
   } catch (err) {
     console.error(err);
