@@ -7,24 +7,55 @@
       <div class="card-body p-4">
         <form action="<%= client ? '/clients/' + client._id + '?_method=PUT' : '/clients' %>" method="POST">
           <div class="mb-3">
-            <label for="name" class="form-label">客戶名稱（診所）<span class="text-danger">*</span></label>
+            <label for="name" class="form-label">診所名稱 <span class="text-danger">*</span></label>
             <input type="text" name="name" id="name" class="form-control" placeholder="例：微笑牙醫診所"
               value="<%= client ? client.name : '' %>" required>
           </div>
-          <div class="mb-3">
-            <label for="contactPerson" class="form-label">聯絡人</label>
-            <input type="text" name="contactPerson" id="contactPerson" class="form-control" placeholder="例：王醫師"
-              value="<%= client ? client.contactPerson || '' : '' %>">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="phone" class="form-label">電話</label>
+              <input type="text" name="phone" id="phone" class="form-control" placeholder="例：02-2345-6789"
+                value="<%= client ? client.phone || '' : '' %>">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="institutionCode" class="form-label">機構代碼</label>
+              <input type="text" name="institutionCode" id="institutionCode" class="form-control" placeholder="例：3731010015"
+                value="<%= client ? client.institutionCode || '' : '' %>">
+            </div>
           </div>
-          <div class="mb-3">
-            <label for="phone" class="form-label">電話</label>
-            <input type="text" name="phone" id="phone" class="form-control" placeholder="例：02-2345-6789"
-              value="<%= client ? client.phone || '' : '' %>">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="city" class="form-label">縣市</label>
+              <input type="text" name="city" id="city" class="form-control" placeholder="例：新北市"
+                value="<%= client ? client.city || '' : '' %>">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="district" class="form-label">行政區</label>
+              <input type="text" name="district" id="district" class="form-control" placeholder="例：板橋區"
+                value="<%= client ? client.district || '' : '' %>">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="contactPerson" class="form-label">聯絡人</label>
+              <input type="text" name="contactPerson" id="contactPerson" class="form-control" placeholder="例：王醫師"
+                value="<%= client ? client.contactPerson || '' : '' %>">
+            </div>
           </div>
           <div class="mb-3">
             <label for="address" class="form-label">地址</label>
-            <input type="text" name="address" id="address" class="form-control" placeholder="例：台北市大安區忠孝東路三段100號"
+            <input type="text" name="address" id="address" class="form-control" placeholder="例：新北市板橋區民族路233號"
               value="<%= client ? client.address || '' : '' %>">
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="website" class="form-label">官網</label>
+              <input type="text" name="website" id="website" class="form-control" placeholder="https://..."
+                value="<%= client ? client.website || '' : '' %>">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="facebook" class="form-label">FB 連結</label>
+              <input type="text" name="facebook" id="facebook" class="form-control" placeholder="https://facebook.com/..."
+                value="<%= client ? client.facebook || '' : '' %>">
+            </div>
           </div>
           <div class="mb-3">
             <label for="notes" class="form-label">備註</label>

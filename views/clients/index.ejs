@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h2><i class="bi bi-building"></i> 客戶管理</h2>
+  <h2><i class="bi bi-building"></i> 客戶管理 <small class="text-muted fs-6">(<%= clients.length %> 筆)</small></h2>
   <div>
     <a href="/clients/import/csv" class="btn btn-outline-primary me-2"><i class="bi bi-upload"></i> CSV 匯入</a>
     <a href="/clients/new" class="btn btn-primary"><i class="bi bi-plus-lg"></i> 新增客戶</a>
@@ -7,13 +7,35 @@
 </div>
 
 <form action="/clients" method="GET" class="mb-3">
-  <div class="input-group">
-    <input type="text" name="search" class="form-control" placeholder="搜尋客戶名稱、聯絡人、地址..."
-      value="<%= typeof search !== 'undefined' ? search : '' %>">
-    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
-    <% if (typeof search !== 'undefined' && search) { %>
-      <a href="/clients" class="btn btn-outline-secondary">清除</a>
+  <div class="row g-2">
+    <div class="col-md-4">
+      <input type="text" name="search" class="form-control" placeholder="搜尋診所名稱、聯絡人、地址、機構代碼..."
+        value="<%= typeof search !== 'undefined' ? search : '' %>">
+    </div>
+    <div class="col-md-2">
+      <select name="city" class="form-select" onchange="this.form.submit()">
+        <option value="">全部縣市</option>
+        <% cities.forEach(c => { %>
+          <option value="<%= c %>" <%= cityFilter === c ? 'selected' : '' %>><%= c %></option>
+        <% }) %>
+      </select>
+    </div>
+    <% if (districts.length > 0) { %>
+      <div class="col-md-2">
+        <select name="district" class="form-select" onchange="this.form.submit()">
+          <option value="">全部行政區</option>
+          <% districts.forEach(d => { %>
+            <option value="<%= d %>" <%= districtFilter === d ? 'selected' : '' %>><%= d %></option>
+          <% }) %>
+        </select>
+      </div>
     <% } %>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> 搜尋</button>
+      <% if (search || cityFilter || districtFilter) { %>
+        <a href="/clients" class="btn btn-outline-secondary">清除</a>
+      <% } %>
+    </div>
   </div>
 </form>
 
@@ -28,22 +50,34 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>名稱</th>
-          <th>聯絡人</th>
+          <th>診所名稱</th>
           <th>電話</th>
+          <th>縣市</th>
+          <th>行政區</th>
           <th>地址</th>
-          <th>建立者</th>
+          <th>聯絡人</th>
+          <th>機構代碼</th>
           <th>操作</th>
         </tr>
       </thead>
       <tbody>
         <% clients.forEach(client => { %>
           <tr>
-            <td><strong><%= client.name %></strong></td>
-            <td><%= client.contactPerson || '-' %></td>
+            <td>
+              <strong><%= client.name %></strong>
+              <% if (client.website) { %>
+                <a href="<%= client.website %>" target="_blank" class="ms-1"><i class="bi bi-globe"></i></a>
+              <% } %>
+              <% if (client.facebook) { %>
+                <a href="<%= client.facebook %>" target="_blank" class="ms-1"><i class="bi bi-facebook"></i></a>
+              <% } %>
+            </td>
             <td><%= client.phone || '-' %></td>
-            <td><%= client.address || '-' %></td>
-            <td><%= client.createdBy ? client.createdBy.name : '-' %></td>
+            <td><%= client.city || '-' %></td>
+            <td><%= client.district || '-' %></td>
+            <td><small><%= client.address || '-' %></small></td>
+            <td><%= client.contactPerson || '-' %></td>
+            <td><small><%= client.institutionCode || '-' %></small></td>
             <td>
               <a href="/clients/<%= client._id %>/edit" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
               <form action="/clients/<%= client._id %>?_method=DELETE" method="POST" class="d-inline"

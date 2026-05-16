@@ -7,13 +7,12 @@
       <div class="card-body p-4">
         <div class="alert alert-info">
           <strong>CSV 格式說明：</strong>
-          <p class="mb-1">第一行為欄位名稱，支援中英文欄位：</p>
-          <code>name/名稱, phone/電話, address/地址, contactPerson/聯絡人, notes/備註</code>
+          <p class="mb-1">第一行為欄位名稱，支援以下欄位：</p>
+          <code>診所名稱, 電話, 地址, 聯絡人, 備註, 機構代碼, 縣市, 行政區, 官網, FB連結</code>
           <hr>
           <strong>範例：</strong>
-          <pre class="mb-0">名稱,電話,地址,聯絡人,備註
-微笑牙醫診所,02-2345-6789,台北市大安區忠孝東路100號,王醫師,VIP客戶
-陽光牙醫,03-456-7890,桃園市中壢區中山路50號,李院長,</pre>
+          <pre class="mb-0">診所名稱,電話,地址,聯絡人,備註,機構代碼,縣市,行政區,官網,FB連結
+微笑牙醫診所,02-2345-6789,新北市板橋區民族路233號,王醫師,,3731010015,新北市,板橋區,,</pre>
         </div>
         <form action="/clients/import/csv" method="POST" enctype="multipart/form-data">
           <div class="mb-3">

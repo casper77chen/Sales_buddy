@@ -12,16 +12,28 @@ const upload = multer({ dest: path.join(__dirname, '../public/uploads/') });
 // 客戶列表
 router.get('/', ensureAuthenticated, async (req, res) => {
   const search = req.query.search || '';
-  const query = search
-    ? { $or: [
-        { name: { $regex: search, $options: 'i' } },
-        { contactPerson: { $regex: search, $options: 'i' } },
-        { address: { $regex: search, $options: 'i' } },
-      ]}
-    : {};
+  const cityFilter = req.query.city || '';
+  const districtFilter = req.query.district || '';
 
-  const clients = await Client.find(query).sort({ createdAt: -1 }).populate('createdBy', 'name');
-  res.render('clients/index', { clients, search });
+  const query = {};
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { contactPerson: { $regex: search, $options: 'i' } },
+      { address: { $regex: search, $options: 'i' } },
+      { institutionCode: { $regex: search, $options: 'i' } },
+    ];
+  }
+  if (cityFilter) query.city = cityFilter;
+  if (districtFilter) query.district = districtFilter;
+
+  const clients = await Client.find(query).sort({ city: 1, district: 1, name: 1 }).populate('createdBy', 'name');
+
+  // 取得所有縣市和行政區供篩選
+  const cities = await Client.distinct('city');
+  const districts = cityFilter ? await Client.distinct('district', { city: cityFilter }) : [];
+
+  res.render('clients/index', { clients, search, cityFilter, districtFilter, cities, districts });
 });
 
 // 新增客戶頁
@@ -31,15 +43,16 @@ router.get('/new', ensureAuthenticated, (req, res) => {
 
 // 新增客戶處理
 router.post('/', ensureAuthenticated, async (req, res) => {
-  const { name, phone, address, contactPerson, notes } = req.body;
+  const { name, phone, address, contactPerson, notes, institutionCode, city, district, website, facebook } = req.body;
 
   if (!name) {
-    req.flash('error_msg', '請填寫客戶名稱');
+    req.flash('error_msg', '請填寫診所名稱');
     return res.redirect('/clients/new');
   }
 
   await Client.create({
     name, phone, address, contactPerson, notes,
+    institutionCode, city, district, website, facebook,
     createdBy: req.user._id,
   });
 
@@ -59,8 +72,11 @@ router.get('/:id/edit', ensureAuthenticated, async (req, res) => {
 
 // 更新客戶
 router.put('/:id', ensureAuthenticated, async (req, res) => {
-  const { name, phone, address, contactPerson, notes } = req.body;
-  await Client.findByIdAndUpdate(req.params.id, { name, phone, address, contactPerson, notes });
+  const { name, phone, address, contactPerson, notes, institutionCode, city, district, website, facebook } = req.body;
+  await Client.findByIdAndUpdate(req.params.id, {
+    name, phone, address, contactPerson, notes,
+    institutionCode, city, district, website, facebook,
+  });
   req.flash('success_msg', '客戶已更新');
   res.redirect('/clients');
 });
@@ -90,13 +106,19 @@ router.post('/import/csv', ensureAuthenticated, upload.single('file'), async (re
   fs.createReadStream(filePath)
     .pipe(csv())
     .on('data', (row) => {
-      if (row.name || row['名稱']) {
+      const name = row['診所名稱'] || row.name || row['名稱'] || '';
+      if (name) {
         results.push({
-          name: row.name || row['名稱'] || '',
-          phone: row.phone || row['電話'] || '',
-          address: row.address || row['地址'] || '',
-          contactPerson: row.contactPerson || row['聯絡人'] || '',
-          notes: row.notes || row['備註'] || '',
+          name,
+          phone: row['電話'] || row.phone || '',
+          address: row['地址'] || row.address || '',
+          contactPerson: row['聯絡人'] || row.contactPerson || '',
+          notes: row['備註'] || row.notes || '',
+          institutionCode: row['機構代碼'] || row.institutionCode || '',
+          city: row['縣市'] || row.city || '',
+          district: row['行政區'] || row.district || '',
+          website: row['官網'] || row.website || '',
+          facebook: row['FB連結'] || row.facebook || '',
           createdBy: req.user._id,
         });
       }
@@ -104,7 +126,7 @@ router.post('/import/csv', ensureAuthenticated, upload.single('file'), async (re
     .on('end', async () => {
       fs.unlinkSync(filePath);
       if (results.length === 0) {
-        req.flash('error_msg', 'CSV 中無有效資料，請確認欄位名稱（name/名稱, phone/電話, address/地址, contactPerson/聯絡人, notes/備註）');
+        req.flash('error_msg', 'CSV 中無有效資料，請確認欄位名稱');
         return res.redirect('/clients/import/csv');
       }
       await Client.insertMany(results);
