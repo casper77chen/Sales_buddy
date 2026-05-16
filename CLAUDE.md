@@ -31,6 +31,13 @@ PORT=3000
 - **manager**: Dashboard, approve mileage claims, view all reps
 - **sales**: Weekly calendar, visit logs, mileage claims
 
+## Zeabur Deployment
+- Project ID: 6a07db626edbb9ee6c70b997
+- Service ID: 6a07db7bd64413c4c61e5869
+- Environment ID: 6a07db62e5ed304c1d8511ca
+- Server: MedTech (Linode Tokyo)
+- Dashboard: https://zeabur.com/projects/6a07db626edbb9ee6c70b997
+
 ## Project Structure
 ```
 config/     - DB, Passport, Mailer, Maps API configs
