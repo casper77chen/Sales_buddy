@@ -1,0 +1,188 @@
+:root {
+  --primary: #4AADE5;
+  --primary-dark: #1B3A5C;
+  --secondary: #2ECC71;
+  --secondary-dark: #27AE60;
+  --bg: #F5F7FA;
+  --text: #333;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+}
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+}
+
+.navbar-brand, .nav-link {
+  color: #fff !important;
+}
+
+.nav-link:hover {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.btn-success {
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+}
+
+.btn-success:hover {
+  background-color: var(--secondary-dark);
+  border-color: var(--secondary-dark);
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: #fff;
+  border-radius: 12px 12px 0 0 !important;
+  font-weight: 600;
+}
+
+/* Dashboard stats */
+.stat-card {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.stat-card .stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.stat-card .stat-label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Visit status badges */
+.badge-scheduled {
+  background-color: #FFC107;
+  color: #333;
+}
+
+.badge-visited {
+  background-color: #28A745;
+  color: #fff;
+}
+
+.badge-cancelled {
+  background-color: #DC3545;
+  color: #fff;
+}
+
+/* Flash messages */
+.alert {
+  border-radius: 8px;
+}
+
+/* Calendar */
+.calendar-table {
+  table-layout: fixed;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.calendar-table th {
+  background: var(--primary-dark);
+  color: #fff;
+  padding: 0.6rem 0.3rem;
+  font-size: 0.85rem;
+}
+
+.calendar-table .time-col {
+  width: 70px;
+  font-size: 0.8rem;
+  color: #666;
+  vertical-align: middle;
+}
+
+.calendar-table .day-col {
+  min-width: 110px;
+}
+
+.calendar-cell {
+  height: 60px;
+  vertical-align: top;
+  padding: 2px !important;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.calendar-cell:hover {
+  background-color: #E3F2FD;
+}
+
+/* Visit cards in calendar */
+.visit-card {
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.visit-card:hover {
+  transform: scale(1.02);
+}
+
+.visit-card-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.visit-scheduled {
+  background-color: #FFF3CD;
+  border-left: 3px solid #FFC107;
+}
+
+.visit-visited {
+  background-color: #D4EDDA;
+  border-left: 3px solid #28A745;
+}
+
+.visit-cancelled {
+  background-color: #F8F9FA;
+  border-left: 3px solid #DC3545;
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* Footer */
+.footer {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: #fff;
+  padding: 1rem 0;
+  margin-top: 3rem;
+}

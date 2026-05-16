@@ -1,0 +1,62 @@
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card mt-3">
+      <div class="card-header">
+        <i class="bi bi-fuel-pump"></i> 油資申報確認
+      </div>
+      <div class="card-body p-4">
+        <div class="alert alert-info">
+          <h6>拜訪客戶：<strong><%= visit.client ? visit.client.name : '未知' %></strong></h6>
+          <small class="text-muted">拜訪日期：<%= visit.date.toISOString().split('T')[0] %> <%= visit.timeSlot %></small>
+        </div>
+
+        <div class="row text-center mb-4">
+          <div class="col-5">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">A 點（出發地）</small>
+              <strong><%= origin %></strong>
+            </div>
+          </div>
+          <div class="col-2 d-flex align-items-center justify-content-center">
+            <i class="bi bi-arrow-right" style="font-size: 1.5rem; color: var(--primary);"></i>
+          </div>
+          <div class="col-5">
+            <div class="border rounded p-3">
+              <small class="text-muted d-block">B 點（目的地）</small>
+              <strong><%= destination %></strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="row text-center mb-4">
+          <div class="col-6">
+            <div class="stat-card card">
+              <div class="stat-number"><%= distance.distanceText %></div>
+              <div class="stat-label">距離</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="stat-card card">
+              <div class="stat-number"><%= distance.durationText %></div>
+              <div class="stat-label">預估車程</div>
+            </div>
+          </div>
+        </div>
+
+        <form action="/mileage" method="POST">
+          <input type="hidden" name="visitId" value="<%= visit._id %>">
+          <input type="hidden" name="originAddress" value="<%= origin %>">
+          <input type="hidden" name="destinationAddress" value="<%= destination %>">
+          <input type="hidden" name="distanceKm" value="<%= distance.distanceKm %>">
+          <input type="hidden" name="distanceText" value="<%= distance.distanceText %>">
+          <input type="hidden" name="durationText" value="<%= distance.durationText %>">
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-send"></i> 送審</button>
+            <a href="/" class="btn btn-outline-secondary">返回</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

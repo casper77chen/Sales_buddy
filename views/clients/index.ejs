@@ -1,0 +1,59 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2><i class="bi bi-building"></i> 客戶管理</h2>
+  <div>
+    <a href="/clients/import/csv" class="btn btn-outline-primary me-2"><i class="bi bi-upload"></i> CSV 匯入</a>
+    <a href="/clients/new" class="btn btn-primary"><i class="bi bi-plus-lg"></i> 新增客戶</a>
+  </div>
+</div>
+
+<form action="/clients" method="GET" class="mb-3">
+  <div class="input-group">
+    <input type="text" name="search" class="form-control" placeholder="搜尋客戶名稱、聯絡人、地址..."
+      value="<%= typeof search !== 'undefined' ? search : '' %>">
+    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+    <% if (typeof search !== 'undefined' && search) { %>
+      <a href="/clients" class="btn btn-outline-secondary">清除</a>
+    <% } %>
+  </div>
+</form>
+
+<% if (clients.length === 0) { %>
+  <div class="text-center text-muted mt-5">
+    <i class="bi bi-building" style="font-size: 3rem;"></i>
+    <p class="mt-2">尚無客戶資料</p>
+    <a href="/clients/new" class="btn btn-primary">新增第一位客戶</a>
+  </div>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>名稱</th>
+          <th>聯絡人</th>
+          <th>電話</th>
+          <th>地址</th>
+          <th>建立者</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% clients.forEach(client => { %>
+          <tr>
+            <td><strong><%= client.name %></strong></td>
+            <td><%= client.contactPerson || '-' %></td>
+            <td><%= client.phone || '-' %></td>
+            <td><%= client.address || '-' %></td>
+            <td><%= client.createdBy ? client.createdBy.name : '-' %></td>
+            <td>
+              <a href="/clients/<%= client._id %>/edit" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+              <form action="/clients/<%= client._id %>?_method=DELETE" method="POST" class="d-inline"
+                onsubmit="return confirm('確定要刪除此客戶嗎？')">
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

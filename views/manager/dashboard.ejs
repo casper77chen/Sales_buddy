@@ -1,0 +1,78 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2><i class="bi bi-speedometer2"></i> 主管面板</h2>
+  <a href="/manager/claims" class="btn btn-primary">
+    <i class="bi bi-clipboard-check"></i> 待審油資
+    <% if (pendingClaims > 0) { %>
+      <span class="badge bg-danger"><%= pendingClaims %></span>
+    <% } %>
+  </a>
+</div>
+
+<p class="text-muted mb-3">
+  本週：<%= monday.toISOString().split('T')[0] %> ~ <%= sunday.toISOString().split('T')[0] %>
+</p>
+
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="stat-number"><%= repStats.reduce((sum, r) => sum + r.totalVisits, 0) %></div>
+      <div class="stat-label">本週總行程</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="stat-number"><%= repStats.reduce((sum, r) => sum + r.completedVisits, 0) %></div>
+      <div class="stat-label">已完成拜訪</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="stat-number"><%= repStats.reduce((sum, r) => sum + r.newClients, 0) %></div>
+      <div class="stat-label">本週新增客戶</div>
+    </div>
+  </div>
+</div>
+
+<h4>各業務本週表現</h4>
+
+<% if (repStats.length === 0) { %>
+  <div class="text-center text-muted mt-4">
+    <p>尚無業務人員</p>
+  </div>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>業務</th>
+          <th class="text-center">排定行程</th>
+          <th class="text-center">已完成拜訪</th>
+          <th class="text-center">完成率</th>
+          <th class="text-center">新增客戶</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% repStats.forEach(item => { %>
+          <tr>
+            <td><strong><%= item.rep.name %></strong></td>
+            <td class="text-center"><%= item.totalVisits %></td>
+            <td class="text-center"><%= item.completedVisits %></td>
+            <td class="text-center">
+              <% const rate = item.totalVisits > 0 ? Math.round(item.completedVisits / item.totalVisits * 100) : 0; %>
+              <div class="progress" style="height: 20px;">
+                <div class="progress-bar bg-success" style="width: <%= rate %>%"><%= rate %>%</div>
+              </div>
+            </td>
+            <td class="text-center"><%= item.newClients %></td>
+            <td>
+              <a href="/?rep=<%= item.rep._id %>" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-calendar-week"></i> 查看行事曆
+              </a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

@@ -1,0 +1,53 @@
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <i class="bi bi-calendar-check"></i> dentall 業務神隊友
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <% if (user) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/"><i class="bi bi-calendar-week"></i> 週行事曆</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/clients"><i class="bi bi-building"></i> 客戶管理</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/mileage"><i class="bi bi-fuel-pump"></i> 油資申報</a>
+          </li>
+          <% if (user.role === 'manager' || user.role === 'admin') { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/manager"><i class="bi bi-speedometer2"></i> 主管面板</a>
+            </li>
+          <% } %>
+          <% if (user.role === 'admin') { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin"><i class="bi bi-gear"></i> 管理</a>
+            </li>
+          <% } %>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle"></i> <%= user.name %>
+              <span class="badge bg-light text-dark ms-1"><%= user.role === 'admin' ? 'Admin' : user.role === 'manager' ? '主管' : '業務' %></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/auth/change-password"><i class="bi bi-key"></i> 修改密碼</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/auth/logout"><i class="bi bi-box-arrow-right"></i> 登出</a></li>
+            </ul>
+          </li>
+        <% } else { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/login"><i class="bi bi-box-arrow-in-right"></i> 登入</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/register"><i class="bi bi-person-plus"></i> 註冊</a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>

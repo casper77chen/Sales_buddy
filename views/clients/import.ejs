@@ -1,0 +1,31 @@
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card mt-3">
+      <div class="card-header">
+        <i class="bi bi-upload"></i> CSV 批次匯入客戶
+      </div>
+      <div class="card-body p-4">
+        <div class="alert alert-info">
+          <strong>CSV 格式說明：</strong>
+          <p class="mb-1">第一行為欄位名稱，支援中英文欄位：</p>
+          <code>name/名稱, phone/電話, address/地址, contactPerson/聯絡人, notes/備註</code>
+          <hr>
+          <strong>範例：</strong>
+          <pre class="mb-0">名稱,電話,地址,聯絡人,備註
+微笑牙醫診所,02-2345-6789,台北市大安區忠孝東路100號,王醫師,VIP客戶
+陽光牙醫,03-456-7890,桃園市中壢區中山路50號,李院長,</pre>
+        </div>
+        <form action="/clients/import/csv" method="POST" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="file" class="form-label">選擇 CSV 檔案</label>
+            <input type="file" name="file" id="file" class="form-control" accept=".csv" required>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-upload"></i> 開始匯入</button>
+            <a href="/clients" class="btn btn-outline-secondary">取消</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,49 @@
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card mt-5">
+      <div class="card-header text-center">
+        <i class="bi bi-person-plus"></i> 註冊帳號
+      </div>
+      <div class="card-body p-4">
+        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+          <div class="alert alert-danger">
+            <% errors.forEach(err => { %>
+              <div><%= err %></div>
+            <% }) %>
+          </div>
+        <% } %>
+        <form action="/auth/register" method="POST">
+          <div class="mb-3">
+            <label for="name" class="form-label">姓名</label>
+            <input type="text" name="name" id="name" class="form-control" placeholder="請輸入姓名"
+              value="<%= typeof name !== 'undefined' ? name : '' %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="請輸入 Email"
+              value="<%= typeof email !== 'undefined' ? email : '' %>" required>
+          </div>
+          <div class="mb-3">
+            <label for="role" class="form-label">角色</label>
+            <select name="role" id="role" class="form-select">
+              <option value="sales" <%= (typeof role !== 'undefined' && role === 'sales') ? 'selected' : '' %>>業務</option>
+              <option value="manager" <%= (typeof role !== 'undefined' && role === 'manager') ? 'selected' : '' %>>主管</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">密碼</label>
+            <input type="password" name="password" id="password" class="form-control" placeholder="至少 6 個字元" required>
+          </div>
+          <div class="mb-3">
+            <label for="password2" class="form-label">確認密碼</label>
+            <input type="password" name="password2" id="password2" class="form-control" placeholder="再次輸入密碼" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">註冊</button>
+        </form>
+        <p class="text-center mt-3 mb-0">
+          已有帳號？<a href="/auth/login">登入</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

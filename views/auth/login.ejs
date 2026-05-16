@@ -1,0 +1,28 @@
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card mt-5">
+      <div class="card-header text-center">
+        <i class="bi bi-box-arrow-in-right"></i> 登入
+      </div>
+      <div class="card-body p-4">
+        <form action="/auth/login" method="POST">
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="請輸入 Email" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">密碼</label>
+            <input type="password" name="password" id="password" class="form-control" placeholder="請輸入密碼" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">登入</button>
+        </form>
+        <div class="text-center mt-3">
+          <a href="/auth/forgot-password" class="text-muted">忘記密碼？</a>
+        </div>
+        <p class="text-center mt-2 mb-0">
+          還沒有帳號？<a href="/auth/register">立即註冊</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

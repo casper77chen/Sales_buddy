@@ -1,0 +1,59 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2><i class="bi bi-clipboard-check"></i> 待審油資清單</h2>
+  <a href="/manager" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> 返回面板</a>
+</div>
+
+<% if (claims.length === 0) { %>
+  <div class="text-center text-muted mt-5">
+    <i class="bi bi-clipboard-check" style="font-size: 3rem;"></i>
+    <p class="mt-2">目前沒有待審的油資申報</p>
+  </div>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>業務</th>
+          <th>客戶</th>
+          <th>出發地</th>
+          <th>目的地</th>
+          <th>距離</th>
+          <th>車程</th>
+          <th>申報日期</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% claims.forEach(claim => { %>
+          <tr>
+            <td><strong><%= claim.salesRep ? claim.salesRep.name : '-' %></strong></td>
+            <td><%= claim.visit && claim.visit.client ? claim.visit.client.name : '-' %></td>
+            <td><%= claim.originAddress %></td>
+            <td><%= claim.destinationAddress %></td>
+            <td><%= claim.distanceText || claim.distanceKm + ' km' %></td>
+            <td><%= claim.durationText || '-' %></td>
+            <td><%= claim.createdAt.toISOString().split('T')[0] %></td>
+            <td>
+              <div class="d-flex gap-1">
+                <form action="/manager/claims/<%= claim._id %>?_method=PUT" method="POST" class="d-inline">
+                  <input type="hidden" name="action" value="approve">
+                  <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('確定核准？')">
+                    <i class="bi bi-check-lg"></i> 核准
+                  </button>
+                </form>
+                <form action="/manager/claims/<%= claim._id %>?_method=PUT" method="POST" class="d-inline">
+                  <input type="hidden" name="action" value="reject">
+                  <input type="text" name="reviewNote" class="form-control form-control-sm d-inline" style="width:120px;"
+                    placeholder="駁回原因">
+                  <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('確定駁回？')">
+                    <i class="bi bi-x-lg"></i> 駁回
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
