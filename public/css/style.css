@@ -122,6 +122,7 @@ body {
   width: 70px;
   font-size: 0.8rem;
   vertical-align: middle;
+  text-align: center;
 }
 
 .calendar-table thead .time-col {
