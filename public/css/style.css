@@ -121,8 +121,11 @@ body {
 .calendar-table .time-col {
   width: 70px;
   font-size: 0.8rem;
-  color: #666;
   vertical-align: middle;
+}
+
+.calendar-table thead .time-col {
+  color: #fff;
 }
 
 .calendar-table .day-col {
