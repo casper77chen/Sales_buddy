@@ -30,6 +30,15 @@ function formatDate(d) {
   return d.toISOString().split('T')[0];
 }
 
+// 計算 ISO 週數（W01-W52）
+function getWeekNumber(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return weekNo;
+}
+
 router.get('/', ensureAuthenticated, async (req, res) => {
   const weekParam = req.query.week || null;
   const repId = req.query.rep || null;
@@ -87,6 +96,9 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     timeSlots.push(`${String(h).padStart(2, '0')}:00`);
   }
 
+  const weekNumber = getWeekNumber(monday);
+  const year = monday.getFullYear();
+
   res.render('dashboard/index', {
     weekDays,
     timeSlots,
@@ -97,6 +109,8 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     selectedRep: targetRepId.toString(),
     salesReps,
     isManager: ['admin', 'manager'].includes(req.user.role),
+    weekLabel: `W${String(weekNumber).padStart(2, '0')}`,
+    year,
   });
 });
 
