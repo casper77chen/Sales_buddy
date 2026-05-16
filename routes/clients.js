@@ -9,26 +9,34 @@ const { ensureAuthenticated } = require('../middleware/auth');
 
 const upload = multer({ dest: path.join(__dirname, '../public/uploads/') });
 
-// 半形轉全形、全形轉半形，產生兩種版本的 regex
-function toFullWidth(str) {
-  return str.replace(/[0-9]/g, c => String.fromCharCode(c.charCodeAt(0) + 0xFEE0));
-}
-function toHalfWidth(str) {
-  return str.replace(/[\uFF10-\uFF19]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
-}
+// 中文數字 <-> 阿拉伯數字 對照
+const cnToDigit = { '零':'0','一':'1','二':'2','三':'3','四':'4','五':'5','六':'6','七':'7','八':'8','九':'9','十':'10' };
+const digitToCn = { '0':'零','1':'一','2':'二','3':'三','4':'四','5':'五','6':'六','7':'七','8':'八','9':'九' };
+
 function buildSearchRegex(term) {
-  // Build a regex that matches both half-width and full-width digits
   let pattern = '';
   for (const ch of term) {
     const code = ch.charCodeAt(0);
     if (code >= 0x30 && code <= 0x39) {
-      // half-width digit -> match both
+      // 半形數字 -> 比對半形、全形、中文
       const fw = String.fromCharCode(code + 0xFEE0);
-      pattern += `[${ch}${fw}]`;
+      const cn = digitToCn[ch] || '';
+      pattern += cn ? `(?:${ch}|${fw}|${cn})` : `[${ch}${fw}]`;
     } else if (code >= 0xFF10 && code <= 0xFF19) {
-      // full-width digit -> match both
+      // 全形數字 -> 比對半形、全形、中文
       const hw = String.fromCharCode(code - 0xFEE0);
-      pattern += `[${hw}${ch}]`;
+      const cn = digitToCn[hw] || '';
+      pattern += cn ? `(?:${hw}|${ch}|${cn})` : `[${hw}${ch}]`;
+    } else if (cnToDigit[ch]) {
+      // 中文數字 -> 比對中文、半形、全形
+      const hw = cnToDigit[ch];
+      if (hw.length === 1) {
+        const fw = String.fromCharCode(hw.charCodeAt(0) + 0xFEE0);
+        pattern += `(?:${ch}|${hw}|${fw})`;
+      } else {
+        // 十 -> 10
+        pattern += `(?:${ch}|${hw})`;
+      }
     } else {
       pattern += ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
