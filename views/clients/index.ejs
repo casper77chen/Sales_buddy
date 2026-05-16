@@ -55,6 +55,7 @@
           <th>縣市</th>
           <th>行政區</th>
           <th>地址</th>
+          <th>負責人</th>
           <th>聯絡人</th>
           <th>機構代碼</th>
           <th>操作</th>
@@ -76,6 +77,7 @@
             <td><%= client.city || '-' %></td>
             <td><%= client.district || '-' %></td>
             <td><small><%= client.address || '-' %></small></td>
+            <td><%= client.owner || '-' %></td>
             <td><%= client.contactPerson || '-' %></td>
             <td><small><%= client.institutionCode || '-' %></small></td>
             <td>

@@ -35,6 +35,13 @@
                 value="<%= client ? client.district || '' : '' %>">
             </div>
             <div class="col-md-4 mb-3">
+              <label for="owner" class="form-label">負責人</label>
+              <input type="text" name="owner" id="owner" class="form-control" placeholder="例：陳院長"
+                value="<%= client ? client.owner || '' : '' %>">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
               <label for="contactPerson" class="form-label">聯絡人</label>
               <input type="text" name="contactPerson" id="contactPerson" class="form-control" placeholder="例：王醫師"
                 value="<%= client ? client.contactPerson || '' : '' %>">

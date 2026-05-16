@@ -43,7 +43,7 @@ router.get('/new', ensureAuthenticated, (req, res) => {
 
 // 新增客戶處理
 router.post('/', ensureAuthenticated, async (req, res) => {
-  const { name, phone, address, contactPerson, notes, institutionCode, city, district, website, facebook } = req.body;
+  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook } = req.body;
 
   if (!name) {
     req.flash('error_msg', '請填寫診所名稱');
@@ -51,7 +51,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
   }
 
   await Client.create({
-    name, phone, address, contactPerson, notes,
+    name, phone, address, owner, contactPerson, notes,
     institutionCode, city, district, website, facebook,
     createdBy: req.user._id,
   });
@@ -72,9 +72,9 @@ router.get('/:id/edit', ensureAuthenticated, async (req, res) => {
 
 // 更新客戶
 router.put('/:id', ensureAuthenticated, async (req, res) => {
-  const { name, phone, address, contactPerson, notes, institutionCode, city, district, website, facebook } = req.body;
+  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook } = req.body;
   await Client.findByIdAndUpdate(req.params.id, {
-    name, phone, address, contactPerson, notes,
+    name, phone, address, owner, contactPerson, notes,
     institutionCode, city, district, website, facebook,
   });
   req.flash('success_msg', '客戶已更新');
@@ -112,6 +112,7 @@ router.post('/import/csv', ensureAuthenticated, upload.single('file'), async (re
           name,
           phone: row['電話'] || row.phone || '',
           address: row['地址'] || row.address || '',
+          owner: row['負責人'] || row.owner || '',
           contactPerson: row['聯絡人'] || row.contactPerson || '',
           notes: row['備註'] || row.notes || '',
           institutionCode: row['機構代碼'] || row.institutionCode || '',

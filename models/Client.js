@@ -4,6 +4,7 @@ const ClientSchema = new mongoose.Schema({
   name: { type: String, required: true },
   phone: { type: String },
   address: { type: String },
+  owner: { type: String },
   contactPerson: { type: String },
   notes: { type: String },
   institutionCode: { type: String },
