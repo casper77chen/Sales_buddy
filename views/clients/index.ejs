@@ -50,6 +50,9 @@
     <table class="table table-hover">
       <thead>
         <tr>
+          <th>d+</th>
+          <th>HIS</th>
+          <th>股東</th>
           <th>診所名稱</th>
           <th>電話</th>
           <th>縣市</th>
@@ -64,6 +67,9 @@
       <tbody>
         <% clients.forEach(client => { %>
           <tr>
+            <td class="text-center"><span class="status-dot <%= client.hasDPlus ? 'dot-on-dplus' : 'dot-off' %>"></span></td>
+            <td class="text-center"><span class="status-dot <%= client.hasHIS ? 'dot-on-his' : 'dot-off' %>"></span></td>
+            <td class="text-center"><span class="status-dot <%= client.isShareholder ? 'dot-on-shareholder' : 'dot-off' %>"></span></td>
             <td>
               <strong><%= client.name %></strong>
               <% if (client.website) { %>

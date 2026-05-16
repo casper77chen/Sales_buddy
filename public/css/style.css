@@ -103,6 +103,33 @@ body {
   border-radius: 8px;
 }
 
+/* Status dots */
+.status-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dot-on-dplus {
+  background-color: #7DD3FC;
+  box-shadow: 0 0 6px #7DD3FC;
+}
+
+.dot-on-his {
+  background-color: #4AADE5;
+  box-shadow: 0 0 6px #4AADE5;
+}
+
+.dot-on-shareholder {
+  background-color: #1B3A5C;
+  box-shadow: 0 0 6px #1B3A5C;
+}
+
+.dot-off {
+  background-color: #ddd;
+}
+
 /* Calendar */
 .calendar-table {
   table-layout: fixed;

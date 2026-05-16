@@ -6,6 +6,23 @@
       </div>
       <div class="card-body p-4">
         <form action="<%= client ? '/clients/' + client._id + '?_method=PUT' : '/clients' %>" method="POST">
+          <div class="mb-3 d-flex gap-4">
+            <div class="form-check">
+              <input type="checkbox" name="hasDPlus" id="hasDPlus" class="form-check-input"
+                <%= client && client.hasDPlus ? 'checked' : '' %>>
+              <label for="hasDPlus" class="form-check-label">d+</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" name="hasHIS" id="hasHIS" class="form-check-input"
+                <%= client && client.hasHIS ? 'checked' : '' %>>
+              <label for="hasHIS" class="form-check-label">HIS</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" name="isShareholder" id="isShareholder" class="form-check-input"
+                <%= client && client.isShareholder ? 'checked' : '' %>>
+              <label for="isShareholder" class="form-check-label">股東</label>
+            </div>
+          </div>
           <div class="mb-3">
             <label for="name" class="form-label">診所名稱 <span class="text-danger">*</span></label>
             <input type="text" name="name" id="name" class="form-control" placeholder="例：微笑牙醫診所"
