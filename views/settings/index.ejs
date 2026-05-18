@@ -1,0 +1,44 @@
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <h2 class="mb-4"><i class="bi bi-gear"></i> 個人設定</h2>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-google"></i> Google Calendar 同步
+      </div>
+      <div class="card-body p-4">
+        <div class="alert alert-info">
+          <strong>使用說明：</strong>
+          <ol class="mb-0 mt-2">
+            <li>開啟 <a href="https://calendar.google.com/calendar/r/settings" target="_blank">Google Calendar 設定</a></li>
+            <li>點選你要同步的行事曆</li>
+            <li>找到「以 iCal 格式表示的公開網址」或「以 iCal 格式表示的私人網址」</li>
+            <li>複製該網址貼到下方</li>
+          </ol>
+        </div>
+
+        <form action="/settings/calendar" method="POST">
+          <div class="mb-3">
+            <label for="googleCalendarUrl" class="form-label">iCal 網址</label>
+            <input type="url" name="googleCalendarUrl" id="googleCalendarUrl" class="form-control"
+              placeholder="https://calendar.google.com/calendar/ical/...basic.ics"
+              value="<%= user.googleCalendarUrl || '' %>">
+            <div class="form-text">系統每 30 分鐘自動同步一次，儲存後會立即同步</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> 儲存並同步</button>
+            <a href="/" class="btn btn-outline-secondary">返回</a>
+          </div>
+        </form>
+
+        <% if (user.googleCalendarUrl) { %>
+          <hr>
+          <div class="d-flex align-items-center">
+            <span class="badge bg-success me-2">已連結</span>
+            <small class="text-muted">行事曆上的 Google 事件會以紫色顯示</small>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

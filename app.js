@@ -62,6 +62,11 @@ app.use('/mileage', require('./routes/mileage'));
 app.use('/manager', require('./routes/manager'));
 app.use('/admin', require('./routes/admin'));
 app.use('/api', require('./routes/api'));
+app.use('/settings', require('./routes/settings'));
+
+// 啟動 Google Calendar 定時同步
+const { startCalendarSync } = require('./config/calendar-sync');
+startCalendarSync();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`伺服器啟動於 http://localhost:${PORT}`));

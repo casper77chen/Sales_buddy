@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const VisitSchema = new mongoose.Schema({
   salesRep: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
+  client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
   date: { type: Date, required: true },
   timeSlot: { type: String, required: true },
   status: { type: String, enum: ['scheduled', 'visited', 'cancelled'], default: 'scheduled' },
@@ -10,6 +10,8 @@ const VisitSchema = new mongoose.Schema({
   content: { type: String },
   followUp: { type: String },
   visitedAt: { type: Date },
+  source: { type: String, enum: ['manual', 'google'], default: 'manual' },
+  googleEventId: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

@@ -210,6 +210,15 @@ body {
   text-decoration: line-through;
 }
 
+.visit-google {
+  background-color: #EDE7F6;
+  border-left: 3px solid #7C3AED;
+}
+
+.visit-google .visit-card-name {
+  color: #7C3AED;
+}
+
 /* Footer */
 .footer {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));

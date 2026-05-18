@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
   role: { type: String, enum: ['admin', 'manager', 'sales'], default: 'sales' },
   isApproved: { type: Boolean, default: false },
   manager: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  googleCalendarUrl: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 
