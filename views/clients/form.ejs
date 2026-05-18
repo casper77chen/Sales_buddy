@@ -81,6 +81,7 @@
                 value="<%= client ? client.facebook || '' : '' %>">
             </div>
           </div>
+          <% if (user.role === 'admin' || user.role === 'manager') { %>
           <div class="mb-3">
             <label for="assignedTo" class="form-label">負責業務</label>
             <select name="assignedTo" id="assignedTo" class="form-select">
@@ -92,6 +93,7 @@
               <% }) %>
             </select>
           </div>
+          <% } %>
           <div class="mb-3">
             <label for="notes" class="form-label">備註</label>
             <textarea name="notes" id="notes" class="form-control" rows="3"

@@ -5,7 +5,7 @@ const { ensureAuthenticated } = require('../middleware/auth');
 
 // 新增拜訪
 router.post('/', ensureAuthenticated, async (req, res) => {
-  const { clientId, date, timeSlot } = req.body;
+  const { clientId, date, timeSlot, content } = req.body;
 
   if (!clientId || !date || !timeSlot) {
     req.flash('error_msg', '請填寫完整資訊');
@@ -18,6 +18,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
     date: new Date(date + 'T00:00:00'),
     timeSlot,
     status: 'scheduled',
+    content: content || '',
   });
 
   req.flash('success_msg', '拜訪行程已新增');
