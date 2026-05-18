@@ -82,6 +82,17 @@
             </div>
           </div>
           <div class="mb-3">
+            <label for="assignedTo" class="form-label">負責業務</label>
+            <select name="assignedTo" id="assignedTo" class="form-select">
+              <option value="">未指派</option>
+              <% salesReps.forEach(rep => { %>
+                <option value="<%= rep._id %>" <%= client && client.assignedTo && client.assignedTo.toString() === rep._id.toString() ? 'selected' : '' %>>
+                  <%= rep.name %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
             <label for="notes" class="form-label">備註</label>
             <textarea name="notes" id="notes" class="form-control" rows="3"
               placeholder="任何備註..."><%= client ? client.notes || '' : '' %></textarea>

@@ -15,6 +15,7 @@ const ClientSchema = new mongoose.Schema({
   district: { type: String },
   website: { type: String },
   facebook: { type: String },
+  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdAt: { type: Date, default: Date.now },
 });
