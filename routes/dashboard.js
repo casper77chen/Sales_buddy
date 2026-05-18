@@ -4,30 +4,38 @@ const Visit = require('../models/Visit');
 const User = require('../models/User');
 const { ensureAuthenticated } = require('../middleware/auth');
 
-// 取得一週的起始（週一）和結束（週日）
+// 取得台灣時間的今天 YYYY-MM-DD
+function getTaiwanToday() {
+  const now = new Date();
+  const tw = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+  return tw.toISOString().split('T')[0];
+}
+
+// 取得一週的起始（週一）和結束（週日），使用 UTC 日期避免時區偏移
 function getWeekRange(dateStr) {
-  let date;
-  if (dateStr) {
-    date = new Date(dateStr + 'T00:00:00');
-  } else {
-    date = new Date();
-  }
-  const day = date.getDay();
+  const str = dateStr || getTaiwanToday();
+  const [y, m, d] = str.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+
+  const day = date.getUTCDay();
   const diffToMonday = day === 0 ? -6 : 1 - day;
   const monday = new Date(date);
-  monday.setDate(date.getDate() + diffToMonday);
-  monday.setHours(0, 0, 0, 0);
+  monday.setUTCDate(date.getUTCDate() + diffToMonday);
+  monday.setUTCHours(0, 0, 0, 0);
 
   const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  sunday.setHours(23, 59, 59, 999);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  sunday.setUTCHours(23, 59, 59, 999);
 
   return { monday, sunday };
 }
 
-// 格式化日期為 YYYY-MM-DD
+// 格式化 UTC 日期為 YYYY-MM-DD
 function formatDate(d) {
-  return d.toISOString().split('T')[0];
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 // 計算 ISO 週數（W01-W52）
@@ -55,12 +63,12 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   let salesReps = [];
 
   if (['admin', 'manager'].includes(req.user.role)) {
-    salesReps = await User.find({ role: 'sales' }).select('name email').sort({ name: 1 });
+    // 主管/Admin 可看所有人的行程（含自己）
+    salesReps = await User.find({ role: { $in: ['sales', 'manager', 'admin'] } }).select('name email role').sort({ name: 1 });
     if (repId) {
       targetRepId = repId;
-    } else if (salesReps.length > 0) {
-      targetRepId = salesReps[0]._id;
     }
+    // 不指定 rep 時預設看自己的行程
   }
 
   // 查詢該週拜訪資料
@@ -72,6 +80,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   // 建立 lookup map: { 'YYYY-MM-DD_HH:00': [visits] }
   const visitMap = {};
   visits.forEach(v => {
+    // visit.date 儲存為 UTC 00:00，直接用 formatDate 取得正確日期
     const dateKey = formatDate(v.date);
     const key = `${dateKey}_${v.timeSlot}`;
     if (!visitMap[key]) visitMap[key] = [];
@@ -83,10 +92,10 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   const dayNames = ['一', '二', '三', '四', '五', '六', '日'];
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
+    d.setUTCDate(monday.getUTCDate() + i);
     weekDays.push({
       date: formatDate(d),
-      label: `${d.getMonth() + 1}/${d.getDate()} (${dayNames[i]})`,
+      label: `${d.getUTCMonth() + 1}/${d.getUTCDate()} (${dayNames[i]})`,
     });
   }
 
