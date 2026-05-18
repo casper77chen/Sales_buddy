@@ -14,9 +14,8 @@ const VisitSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-VisitSchema.pre('save', function (next) {
+VisitSchema.pre('save', function () {
   this.updatedAt = Date.now();
-  next();
 });
 
 module.exports = mongoose.model('Visit', VisitSchema);
