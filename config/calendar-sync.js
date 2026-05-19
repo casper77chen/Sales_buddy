@@ -29,9 +29,10 @@ async function syncUserCalendar(user) {
       const eventId = event.uid || key;
       googleEventIds.push(eventId);
 
-      // 取得日期和時間
-      const dateUtc = new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate()));
-      const hour = start.getHours();
+      // 取得台灣時間（UTC+8）的日期和時間
+      const twTime = new Date(start.getTime() + 8 * 60 * 60 * 1000);
+      const dateUtc = new Date(Date.UTC(twTime.getUTCFullYear(), twTime.getUTCMonth(), twTime.getUTCDate()));
+      const hour = twTime.getUTCHours();
       const timeSlot = `${String(hour).padStart(2, '0')}:00`;
 
       const summary = event.summary || '(無標題)';
@@ -39,9 +40,9 @@ async function syncUserCalendar(user) {
       const location = event.location || '';
       const content = [summary, description, location].filter(Boolean).join('\n');
 
-      // 計算跨幾個小時
+      // 計算跨幾個小時（上限 12 小時，防止全天事件爆量）
       const end = event.end ? new Date(event.end) : new Date(start.getTime() + 60 * 60 * 1000);
-      const durationHours = Math.ceil((end - start) / (60 * 60 * 1000));
+      const durationHours = Math.min(Math.ceil((end - start) / (60 * 60 * 1000)), 12);
 
       // 為每個小時建立一筆 visit（或更新）
       for (let h = 0; h < durationHours && (hour + h) <= 18; h++) {
