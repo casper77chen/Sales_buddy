@@ -24,7 +24,7 @@
               <label for="isShareholder" class="form-check-label">股東</label>
             </div>
           </div>
-          <div id="dPlusSection" class="mb-3 d-flex gap-3 align-items-end p-3 rounded" style="background:#f0f7ff; <%- (client && client.hasDPlus) ? '' : 'display:none;' %>">
+          <div id="dPlusSection" class="mb-3 d-flex gap-3 align-items-end p-3 rounded" style="background:#f0f7ff;">
             <div>
               <label for="dPlusContractDate" class="form-label mb-1" style="font-size:0.85rem;">d+ 合約日期</label>
               <input type="date" name="dPlusContractDate" id="dPlusContractDate" class="form-control form-control-sm" style="width:160px;"
@@ -124,3 +124,13 @@
     </div>
   </div>
 </div>
+<script>
+  // 頁面載入時根據 d+ checkbox 狀態決定顯示
+  (function() {
+    var cb = document.getElementById('hasDPlus');
+    var section = document.getElementById('dPlusSection');
+    if (cb && section) {
+      section.style.display = cb.checked ? 'flex' : 'none';
+    }
+  })();
+</script>
