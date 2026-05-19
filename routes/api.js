@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Client = require('../models/Client');
+const Visit = require('../models/Visit');
 const { ensureAuthenticated } = require('../middleware/auth');
 
 // 客戶搜尋 API（autocomplete 用）
@@ -16,6 +17,14 @@ router.get('/clients/search', ensureAuthenticated, async (req, res) => {
   }).limit(10).select('name phone address contactPerson');
 
   res.json(clients);
+});
+
+// 客戶拜訪紀錄 API
+router.get('/clients/:id/visits', ensureAuthenticated, async (req, res) => {
+  const visits = await Visit.find({ client: req.params.id })
+    .populate('salesRep', 'name')
+    .sort({ date: -1, timeSlot: -1 });
+  res.json(visits);
 });
 
 module.exports = router;

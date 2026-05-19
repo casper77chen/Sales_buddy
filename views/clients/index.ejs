@@ -81,7 +81,7 @@
             <td class="text-center"><span class="status-dot <%= client.hasHIS ? 'dot-on-his' : 'dot-off' %>"></span></td>
             <td class="text-center"><span class="status-dot <%= client.isShareholder ? 'dot-on-shareholder' : 'dot-off' %>"></span></td>
             <td>
-              <strong><%= client.name %></strong>
+              <strong><a href="#" class="text-decoration-none" onclick="openVisitHistory('<%= client._id %>', '<%= client.name.replace(/'/g, "\\'") %>'); return false;"><%= client.name %></a></strong>
               <% if (client.website) { %>
                 <a href="<%= client.website %>" target="_blank" class="ms-1"><i class="bi bi-globe"></i></a>
               <% } %>
@@ -110,3 +110,72 @@
     </table>
   </div>
 <% } %>
+
+<!-- 拜訪紀錄 Modal -->
+<div class="modal fade" id="visitHistoryModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-clock-history"></i> <span id="vhClientName"></span> - 拜訪紀錄</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="vhLoading" class="text-center py-4">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">載入中...</p>
+        </div>
+        <div id="vhEmpty" class="text-center py-4" style="display:none;">
+          <i class="bi bi-calendar-x" style="font-size: 2rem; color: #ccc;"></i>
+          <p class="mt-2 text-muted">尚無拜訪紀錄</p>
+        </div>
+        <div id="vhList" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function openVisitHistory(clientId, clientName) {
+  document.getElementById('vhClientName').textContent = clientName;
+  document.getElementById('vhLoading').style.display = 'block';
+  document.getElementById('vhEmpty').style.display = 'none';
+  document.getElementById('vhList').style.display = 'none';
+
+  new bootstrap.Modal(document.getElementById('visitHistoryModal')).show();
+
+  const res = await fetch('/api/clients/' + clientId + '/visits');
+  const visits = await res.json();
+
+  document.getElementById('vhLoading').style.display = 'none';
+
+  if (visits.length === 0) {
+    document.getElementById('vhEmpty').style.display = 'block';
+    return;
+  }
+
+  const statusMap = { scheduled: '預排', visited: '已訪', cancelled: '取消' };
+  const badgeMap = { scheduled: 'bg-warning text-dark', visited: 'bg-success', cancelled: 'bg-danger' };
+
+  let html = '<div class="list-group">';
+  visits.forEach(v => {
+    const date = v.date ? v.date.split('T')[0] : '-';
+    const rep = v.salesRep ? v.salesRep.name : '-';
+    html += '<div class="list-group-item">';
+    html += '<div class="d-flex justify-content-between align-items-start">';
+    html += '<div>';
+    html += '<strong>' + date + ' ' + (v.timeSlot || '') + '</strong>';
+    html += ' <span class="badge ' + (badgeMap[v.status] || 'bg-secondary') + '">' + (statusMap[v.status] || v.status) + '</span>';
+    html += '<br><small class="text-muted">業務：' + rep + '</small>';
+    html += '</div>';
+    html += '</div>';
+    if (v.contactPerson) html += '<div class="mt-1"><small><strong>對象：</strong>' + v.contactPerson + '</small></div>';
+    if (v.content) html += '<div class="mt-1"><small><strong>內容：</strong>' + v.content.replace(/\n/g, '<br>') + '</small></div>';
+    if (v.followUp) html += '<div class="mt-1"><small><strong>追蹤：</strong>' + v.followUp.replace(/\n/g, '<br>') + '</small></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  document.getElementById('vhList').innerHTML = html;
+  document.getElementById('vhList').style.display = 'block';
+}
+</script>
