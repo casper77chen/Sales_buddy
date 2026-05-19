@@ -116,6 +116,21 @@ body {
   box-shadow: 0 0 6px #7DD3FC;
 }
 
+.dot-dplus-expired {
+  background-color: #DC3545;
+  box-shadow: 0 0 6px #DC3545;
+}
+
+.dot-dplus-extended {
+  background-color: #FFC107;
+  box-shadow: 0 0 6px #FFC107;
+}
+
+.dot-dplus-achieved {
+  background-color: #28A745;
+  box-shadow: 0 0 6px #28A745;
+}
+
 .dot-on-his {
   background-color: #4AADE5;
   box-shadow: 0 0 6px #4AADE5;

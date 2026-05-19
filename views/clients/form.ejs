@@ -12,6 +12,19 @@
                 <%= client && client.hasDPlus ? 'checked' : '' %>>
               <label for="hasDPlus" class="form-check-label">d+</label>
             </div>
+            <div class="ms-3">
+              <label for="dPlusContractDate" class="form-label mb-0" style="font-size:0.85rem;">d+ 合約日期</label>
+              <input type="date" name="dPlusContractDate" id="dPlusContractDate" class="form-control form-control-sm" style="width:160px;"
+                value="<%= client && client.dPlusContractDate ? client.dPlusContractDate.toISOString().split('T')[0] : '' %>">
+            </div>
+            <div class="ms-3">
+              <label for="dPlusStatus" class="form-label mb-0" style="font-size:0.85rem;">d+ 合約狀態</label>
+              <select name="dPlusStatus" id="dPlusStatus" class="form-select form-select-sm" style="width:160px;">
+                <option value="" <%= client && client.dPlusStatus === '' ? 'selected' : '' %>>自動判斷</option>
+                <option value="extended" <%= client && client.dPlusStatus === 'extended' ? 'selected' : '' %>>未達標已展延</option>
+                <option value="achieved" <%= client && client.dPlusStatus === 'achieved' ? 'selected' : '' %>>業績達標</option>
+              </select>
+            </div>
             <div class="form-check">
               <input type="checkbox" name="hasHIS" id="hasHIS" class="form-check-input"
                 <%= client && client.hasHIS ? 'checked' : '' %>>

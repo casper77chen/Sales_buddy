@@ -77,7 +77,34 @@
       <tbody>
         <% clients.forEach(client => { %>
           <tr>
-            <td class="text-center"><span class="status-dot <%= client.hasDPlus ? 'dot-on-dplus' : 'dot-off' %>"></span></td>
+            <%
+              let dplusDotClass = 'dot-off';
+              let dplusTitle = '';
+              if (client.hasDPlus) {
+                if (client.dPlusStatus === 'achieved') {
+                  dplusDotClass = 'dot-dplus-achieved';
+                  dplusTitle = '業績達標';
+                } else if (client.dPlusStatus === 'extended') {
+                  dplusDotClass = 'dot-dplus-extended';
+                  dplusTitle = '未達標已展延';
+                } else if (client.dPlusContractDate) {
+                  const contractDate = new Date(client.dPlusContractDate);
+                  const oneYearLater = new Date(contractDate);
+                  oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+                  if (new Date() > oneYearLater) {
+                    dplusDotClass = 'dot-dplus-expired';
+                    dplusTitle = '合約過期 (' + client.dPlusContractDate.toISOString().split('T')[0] + ')';
+                  } else {
+                    dplusDotClass = 'dot-on-dplus';
+                    dplusTitle = '合約有效 (' + client.dPlusContractDate.toISOString().split('T')[0] + ')';
+                  }
+                } else {
+                  dplusDotClass = 'dot-on-dplus';
+                  dplusTitle = 'd+ (未設合約日期)';
+                }
+              }
+            %>
+            <td class="text-center"><span class="status-dot <%= dplusDotClass %>" title="<%= dplusTitle %>"></span></td>
             <td class="text-center"><span class="status-dot <%= client.hasHIS ? 'dot-on-his' : 'dot-off' %>"></span></td>
             <td class="text-center"><span class="status-dot <%= client.isShareholder ? 'dot-on-shareholder' : 'dot-off' %>"></span></td>
             <td>

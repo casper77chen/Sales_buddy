@@ -89,7 +89,7 @@ router.get('/new', ensureAuthenticated, async (req, res) => {
 
 // 新增客戶處理
 router.post('/', ensureAuthenticated, async (req, res) => {
-  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook, hasDPlus, hasHIS, isShareholder, assignedTo } = req.body;
+  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook, hasDPlus, hasHIS, isShareholder, assignedTo, dPlusContractDate, dPlusStatus } = req.body;
 
   if (!name) {
     req.flash('error_msg', '請填寫診所名稱');
@@ -100,6 +100,8 @@ router.post('/', ensureAuthenticated, async (req, res) => {
     name, phone, address, owner, contactPerson, notes,
     institutionCode, city, district, website, facebook,
     hasDPlus: hasDPlus === 'on', hasHIS: hasHIS === 'on', isShareholder: isShareholder === 'on',
+    dPlusContractDate: dPlusContractDate || null,
+    dPlusStatus: dPlusStatus || '',
     assignedTo: assignedTo || null,
     createdBy: req.user._id,
   });
@@ -121,11 +123,13 @@ router.get('/:id/edit', ensureAuthenticated, async (req, res) => {
 
 // 更新客戶
 router.put('/:id', ensureAuthenticated, async (req, res) => {
-  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook, hasDPlus, hasHIS, isShareholder, assignedTo } = req.body;
+  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook, hasDPlus, hasHIS, isShareholder, assignedTo, dPlusContractDate, dPlusStatus } = req.body;
   await Client.findByIdAndUpdate(req.params.id, {
     name, phone, address, owner, contactPerson, notes,
     institutionCode, city, district, website, facebook,
     hasDPlus: hasDPlus === 'on', hasHIS: hasHIS === 'on', isShareholder: isShareholder === 'on',
+    dPlusContractDate: dPlusContractDate || null,
+    dPlusStatus: dPlusStatus || '',
     assignedTo: assignedTo || null,
   });
   req.flash('success_msg', '客戶已更新');

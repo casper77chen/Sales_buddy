@@ -5,6 +5,8 @@ const ClientSchema = new mongoose.Schema({
   phone: { type: String },
   address: { type: String },
   hasDPlus: { type: Boolean, default: false },
+  dPlusContractDate: { type: Date },
+  dPlusStatus: { type: String, enum: ['', 'extended', 'achieved'], default: '' },
   hasHIS: { type: Boolean, default: false },
   isShareholder: { type: Boolean, default: false },
   owner: { type: String },
