@@ -48,6 +48,12 @@ function getWeekNumber(d) {
 }
 
 router.get('/', ensureAuthenticated, async (req, res) => {
+  // 每次載入行事曆時，同步該使用者的 Google Calendar
+  if (req.user.googleCalendarUrl) {
+    const { syncUserCalendar } = require('../config/calendar-sync');
+    syncUserCalendar(req.user).catch(err => console.error('[Calendar Sync] 即時同步失敗:', err.message));
+  }
+
   const weekParam = req.query.week || null;
   const repId = req.query.rep || null;
   const { monday, sunday } = getWeekRange(weekParam);
