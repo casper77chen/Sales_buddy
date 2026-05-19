@@ -11,7 +11,15 @@ function getTaiwanToday() {
   return tw.toISOString().split('T')[0];
 }
 
-// 取得一週的起始（週一）和結束（週日），使用 UTC 日期避免時區偏移
+// 格式化 UTC 日期為 YYYY-MM-DD
+function formatDate(d) {
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// 取得一週的起始（週一）和結束（週日）
 function getWeekRange(dateStr) {
   const str = dateStr || getTaiwanToday();
   const [y, m, d] = str.split('-').map(Number);
@@ -30,52 +38,55 @@ function getWeekRange(dateStr) {
   return { monday, sunday };
 }
 
-// 格式化 UTC 日期為 YYYY-MM-DD
-function formatDate(d) {
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+// 取得月份的起始和結束
+function getMonthRange(yearMonth) {
+  const str = yearMonth || getTaiwanToday().substring(0, 7);
+  const [y, m] = str.split('-').map(Number);
+  const first = new Date(Date.UTC(y, m - 1, 1, 0, 0, 0, 0));
+  const last = new Date(Date.UTC(y, m, 0, 23, 59, 59, 999));
+  return { first, last, year: y, month: m };
 }
 
 // 計算 ISO 週數（W01-W52）
 function getWeekNumber(d) {
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
   date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
   const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
   return weekNo;
 }
 
+// 共用：取得目標業務 ID 和業務清單
+async function getTargetRep(req) {
+  let targetRepId = req.user._id;
+  let salesReps = [];
+  const repId = req.query.rep || null;
+
+  if (['admin', 'manager'].includes(req.user.role)) {
+    salesReps = await User.find({ role: { $in: ['sales', 'manager', 'admin'] } }).select('name email role').sort({ name: 1 });
+    if (repId) targetRepId = repId;
+  }
+
+  return { targetRepId, salesReps, selectedRep: targetRepId.toString() };
+}
+
+// 週檢視
 router.get('/', ensureAuthenticated, async (req, res) => {
-  // 每次載入行事曆時，同步該使用者的 Google Calendar
+  // 即時同步 Google Calendar
   if (req.user.googleCalendarUrl) {
     const { syncUserCalendar } = require('../config/calendar-sync');
     syncUserCalendar(req.user).catch(err => console.error('[Calendar Sync] 即時同步失敗:', err.message));
   }
 
   const weekParam = req.query.week || null;
-  const repId = req.query.rep || null;
   const { monday, sunday } = getWeekRange(weekParam);
+  const { targetRepId, salesReps, selectedRep } = await getTargetRep(req);
 
   // 前一週 / 後一週
   const prevMonday = new Date(monday);
-  prevMonday.setDate(monday.getDate() - 7);
+  prevMonday.setUTCDate(monday.getUTCDate() - 7);
   const nextMonday = new Date(monday);
-  nextMonday.setDate(monday.getDate() + 7);
-
-  // 決定要看哪位業務的行程
-  let targetRepId = req.user._id;
-  let salesReps = [];
-
-  if (['admin', 'manager'].includes(req.user.role)) {
-    // 主管/Admin 可看所有人的行程（含自己）
-    salesReps = await User.find({ role: { $in: ['sales', 'manager', 'admin'] } }).select('name email role').sort({ name: 1 });
-    if (repId) {
-      targetRepId = repId;
-    }
-    // 不指定 rep 時預設看自己的行程
-  }
+  nextMonday.setUTCDate(monday.getUTCDate() + 7);
 
   // 查詢該週拜訪資料
   const visits = await Visit.find({
@@ -83,10 +94,9 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     date: { $gte: monday, $lte: sunday },
   }).populate('client', 'name phone address').sort({ date: 1, timeSlot: 1 });
 
-  // 建立 lookup map: { 'YYYY-MM-DD_HH:00': [visits] }
+  // 建立 lookup map
   const visitMap = {};
   visits.forEach(v => {
-    // visit.date 儲存為 UTC 00:00，直接用 formatDate 取得正確日期
     const dateKey = formatDate(v.date);
     const key = `${dateKey}_${v.timeSlot}`;
     if (!visitMap[key]) visitMap[key] = [];
@@ -105,26 +115,99 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     });
   }
 
-  // 時間格：08:00 - 18:00
   const timeSlots = [];
   for (let h = 8; h <= 18; h++) {
     timeSlots.push(`${String(h).padStart(2, '0')}:00`);
   }
 
   const weekNumber = getWeekNumber(monday);
-  const year = monday.getFullYear();
+  const year = monday.getUTCFullYear();
 
   res.render('dashboard/index', {
+    view: 'week',
     weekDays,
     timeSlots,
     visitMap,
     prevWeek: formatDate(prevMonday),
     nextWeek: formatDate(nextMonday),
     currentWeek: formatDate(monday),
-    selectedRep: targetRepId.toString(),
+    selectedRep,
     salesReps,
     isManager: ['admin', 'manager'].includes(req.user.role),
     weekLabel: `W${String(weekNumber).padStart(2, '0')}`,
+    year,
+  });
+});
+
+// 月檢視
+router.get('/month', ensureAuthenticated, async (req, res) => {
+  if (req.user.googleCalendarUrl) {
+    const { syncUserCalendar } = require('../config/calendar-sync');
+    syncUserCalendar(req.user).catch(err => console.error('[Calendar Sync] 即時同步失敗:', err.message));
+  }
+
+  const monthParam = req.query.month || null;
+  const { first, last, year, month } = getMonthRange(monthParam);
+  const { targetRepId, salesReps, selectedRep } = await getTargetRep(req);
+
+  // 前一月 / 後一月
+  const prevMonth = month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, '0')}`;
+  const nextMonth = month === 12 ? `${year + 1}-01` : `${year}-${String(month + 1).padStart(2, '0')}`;
+
+  // 查詢該月拜訪資料
+  const visits = await Visit.find({
+    salesRep: targetRepId,
+    date: { $gte: first, $lte: last },
+  }).populate('client', 'name phone address').sort({ date: 1, timeSlot: 1 });
+
+  // 建立 lookup map: { 'YYYY-MM-DD': [visits] }
+  const visitMap = {};
+  visits.forEach(v => {
+    const dateKey = formatDate(v.date);
+    if (!visitMap[dateKey]) visitMap[dateKey] = [];
+    visitMap[dateKey].push(v);
+  });
+
+  // 產生月曆格子（從該月第一天的週一開始，到最後一天的週日結束）
+  const dayNames = ['一', '二', '三', '四', '五', '六', '日'];
+  const firstDay = first.getUTCDay();
+  const startOffset = firstDay === 0 ? -6 : 1 - firstDay;
+  const calendarStart = new Date(first);
+  calendarStart.setUTCDate(first.getUTCDate() + startOffset);
+
+  const weeks = [];
+  let current = new Date(calendarStart);
+  while (true) {
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+      const dateStr = formatDate(current);
+      week.push({
+        date: dateStr,
+        day: current.getUTCDate(),
+        isCurrentMonth: current.getUTCMonth() + 1 === month,
+        visits: visitMap[dateStr] || [],
+      });
+      current.setUTCDate(current.getUTCDate() + 1);
+    }
+    weeks.push(week);
+    if (current.getUTCMonth() + 1 !== month && current.getUTCDay() === 1) break;
+    if (weeks.length >= 6) break;
+  }
+
+  const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+
+  res.render('dashboard/index', {
+    view: 'month',
+    weeks,
+    dayNames,
+    visitMap,
+    prevMonth,
+    nextMonth,
+    currentMonth: `${year}-${String(month).padStart(2, '0')}`,
+    monthLabel: `${year} ${monthNames[month - 1]}`,
+    selectedRep,
+    salesReps,
+    isManager: ['admin', 'manager'].includes(req.user.role),
     year,
   });
 });

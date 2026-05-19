@@ -1,11 +1,11 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
   <div>
-    <h2 class="mb-0"><i class="bi bi-calendar-week"></i> <%= year %> 週行事曆</h2>
+    <h2 class="mb-0"><i class="bi bi-calendar-week"></i> <%= year %> 行事曆</h2>
   </div>
   <div class="d-flex align-items-center gap-2">
     <% if (isManager && salesReps.length > 0) { %>
       <select id="repSelector" class="form-select form-select-sm" style="width: auto;"
-        onchange="location.href='/?week=<%= currentWeek %>&rep=' + this.value">
+        onchange="location.href='<%= view === 'month' ? '/month?month=' + currentMonth : '/?week=' + currentWeek %>&rep=' + this.value">
         <% salesReps.forEach(rep => { %>
           <option value="<%= rep._id %>" <%= rep._id.toString() === selectedRep ? 'selected' : '' %>>
             <%= rep.name %>
@@ -13,19 +13,41 @@
         <% }) %>
       </select>
     <% } %>
-    <a href="/<%= isManager && selectedRep ? '?rep=' + selectedRep : '' %>" class="btn btn-primary btn-sm">
-      <i class="bi bi-calendar-check"></i> 本週
-    </a>
-    <a href="/?week=<%= prevWeek %><%= isManager && selectedRep ? '&rep=' + selectedRep : '' %>" class="btn btn-outline-primary btn-sm">
-      <i class="bi bi-chevron-left"></i>
-    </a>
-    <span class="fw-bold text-primary"><%= weekLabel %></span>
-    <a href="/?week=<%= nextWeek %><%= isManager && selectedRep ? '&rep=' + selectedRep : '' %>" class="btn btn-outline-primary btn-sm">
-      <i class="bi bi-chevron-right"></i>
-    </a>
+
+    <!-- 週/月切換 -->
+    <div class="btn-group btn-group-sm">
+      <a href="/<%= selectedRep && isManager ? '?rep=' + selectedRep : '' %>" class="btn <%= view === 'week' ? 'btn-primary' : 'btn-outline-primary' %>">週</a>
+      <a href="/month<%= selectedRep && isManager ? '?rep=' + selectedRep : '' %>" class="btn <%= view === 'month' ? 'btn-primary' : 'btn-outline-primary' %>">月</a>
+    </div>
+
+    <% if (view === 'week') { %>
+      <a href="/<%= isManager && selectedRep ? '?rep=' + selectedRep : '' %>" class="btn btn-primary btn-sm">
+        <i class="bi bi-calendar-check"></i> 本週
+      </a>
+      <a href="/?week=<%= prevWeek %><%= isManager && selectedRep ? '&rep=' + selectedRep : '' %>" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-chevron-left"></i>
+      </a>
+      <span class="fw-bold text-primary"><%= weekLabel %></span>
+      <a href="/?week=<%= nextWeek %><%= isManager && selectedRep ? '&rep=' + selectedRep : '' %>" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-chevron-right"></i>
+      </a>
+    <% } else { %>
+      <a href="/month<%= isManager && selectedRep ? '?rep=' + selectedRep : '' %>" class="btn btn-primary btn-sm">
+        <i class="bi bi-calendar-check"></i> 本月
+      </a>
+      <a href="/month?month=<%= prevMonth %><%= isManager && selectedRep ? '&rep=' + selectedRep : '' %>" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-chevron-left"></i>
+      </a>
+      <span class="fw-bold text-primary"><%= monthLabel %></span>
+      <a href="/month?month=<%= nextMonth %><%= isManager && selectedRep ? '&rep=' + selectedRep : '' %>" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-chevron-right"></i>
+      </a>
+    <% } %>
   </div>
 </div>
 
+<% if (view === 'week') { %>
+<!-- ===== 週檢視 ===== -->
 <div class="table-responsive">
   <table class="table table-bordered calendar-table">
     <thead>
@@ -69,6 +91,48 @@
     </tbody>
   </table>
 </div>
+
+<% } else { %>
+<!-- ===== 月檢視 ===== -->
+<div class="table-responsive">
+  <table class="table table-bordered calendar-table month-table">
+    <thead>
+      <tr>
+        <% dayNames.forEach(d => { %>
+          <th class="text-center"><%= d %></th>
+        <% }) %>
+      </tr>
+    </thead>
+    <tbody>
+      <% weeks.forEach(week => { %>
+        <tr>
+          <% week.forEach(day => { %>
+            <td class="month-cell <%= day.isCurrentMonth ? '' : 'text-muted bg-light' %>"
+              onclick="openAddModal('<%= day.date %>', '09:00')">
+              <div class="month-day-number"><%= day.day %></div>
+              <% day.visits.slice(0, 4).forEach(v => { %>
+                <% if (v.source === 'google') { %>
+                  <div class="month-event month-event-google" title="<%= v.content || '' %>">
+                    <small><%= v.timeSlot %> <%= v.content ? v.content.split('\n')[0] : 'Google' %></small>
+                  </div>
+                <% } else { %>
+                  <div class="month-event month-event-<%= v.status %>"
+                    onclick="event.stopPropagation(); openEditModal('<%= v._id %>')" title="<%= v.client ? v.client.name : '' %>">
+                    <small><%= v.timeSlot %> <%= v.client ? v.client.name : (v.content ? v.content.split('\n')[0] : '') %></small>
+                  </div>
+                <% } %>
+              <% }) %>
+              <% if (day.visits.length > 4) { %>
+                <div class="text-muted" style="font-size:0.7rem;">+<%= day.visits.length - 4 %> 更多</div>
+              <% } %>
+            </td>
+          <% }) %>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<% } %>
 
 <!-- 新增拜訪 Modal -->
 <div class="modal fade" id="addVisitModal" tabindex="-1">
@@ -190,13 +254,7 @@
 </div>
 
 <script src="/js/calendar.js"></script>
-
-<%
-  // 檢查是否需要顯示油資提示
-  const showMileageId = typeof require !== 'undefined' ? '' : '';
-%>
 <script>
-  // 從 URL 參數取得 showMileage
   const urlParams = new URLSearchParams(window.location.search);
   const showMileageId = urlParams.get('showMileage');
   if (showMileageId) {

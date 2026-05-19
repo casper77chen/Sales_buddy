@@ -219,6 +219,64 @@ body {
   color: #7C3AED;
 }
 
+/* Month view */
+.month-table {
+  table-layout: fixed;
+}
+
+.month-cell {
+  height: 110px;
+  vertical-align: top;
+  padding: 4px !important;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.month-cell:hover {
+  background-color: #E3F2FD !important;
+}
+
+.month-day-number {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 2px;
+  color: var(--primary-dark);
+}
+
+.month-event {
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-bottom: 1px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.month-event-scheduled {
+  background-color: #FFF3CD;
+  border-left: 2px solid #FFC107;
+}
+
+.month-event-visited {
+  background-color: #D4EDDA;
+  border-left: 2px solid #28A745;
+}
+
+.month-event-cancelled {
+  background-color: #F8F9FA;
+  border-left: 2px solid #DC3545;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.month-event-google {
+  background-color: #EDE7F6;
+  border-left: 2px solid #7C3AED;
+  color: #7C3AED;
+}
+
 /* Footer */
 .footer {
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
