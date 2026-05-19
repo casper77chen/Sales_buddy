@@ -50,6 +50,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   const search = req.query.search || '';
   const cityFilter = req.query.city || '';
   const districtFilter = req.query.district || '';
+  const repFilter = req.query.rep || '';
 
   const query = {};
   if (search) {
@@ -64,14 +65,20 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   }
   if (cityFilter) query.city = cityFilter;
   if (districtFilter) query.district = districtFilter;
+  if (repFilter === 'unassigned') {
+    query.assignedTo = { $in: [null, undefined] };
+  } else if (repFilter) {
+    query.assignedTo = repFilter;
+  }
 
   const clients = await Client.find(query).sort({ city: 1, district: 1, name: 1 }).populate('createdBy', 'name').populate('assignedTo', 'name');
 
   // 取得所有縣市和行政區供篩選
   const cities = await Client.distinct('city');
   const districts = cityFilter ? await Client.distinct('district', { city: cityFilter }) : [];
+  const salesReps = await User.find({ role: { $in: ['sales', 'manager'] }, isApproved: true }).select('name').sort({ name: 1 });
 
-  res.render('clients/index', { clients, search, cityFilter, districtFilter, cities, districts });
+  res.render('clients/index', { clients, search, cityFilter, districtFilter, repFilter, cities, districts, salesReps });
 });
 
 // 新增客戶頁

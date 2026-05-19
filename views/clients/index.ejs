@@ -8,9 +8,18 @@
 
 <form action="/clients" method="GET" class="mb-3">
   <div class="row g-2">
-    <div class="col-md-4">
-      <input type="text" name="search" class="form-control" placeholder="搜尋診所名稱、聯絡人、地址、機構代碼..."
+    <div class="col-md-3">
+      <input type="text" name="search" class="form-control" placeholder="搜尋診所名稱、聯絡人、地址..."
         value="<%= typeof search !== 'undefined' ? search : '' %>">
+    </div>
+    <div class="col-md-2">
+      <select name="rep" class="form-select" onchange="this.form.submit()">
+        <option value="">全部業務</option>
+        <option value="unassigned" <%= repFilter === 'unassigned' ? 'selected' : '' %>>未指派</option>
+        <% salesReps.forEach(r => { %>
+          <option value="<%= r._id %>" <%= repFilter === r._id.toString() ? 'selected' : '' %>><%= r.name %></option>
+        <% }) %>
+      </select>
     </div>
     <div class="col-md-2">
       <select name="city" class="form-select" onchange="this.form.submit()">
@@ -32,7 +41,7 @@
     <% } %>
     <div class="col-md-2">
       <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> 搜尋</button>
-      <% if (search || cityFilter || districtFilter) { %>
+      <% if (search || cityFilter || districtFilter || repFilter) { %>
         <a href="/clients" class="btn btn-outline-secondary">清除</a>
       <% } %>
     </div>
