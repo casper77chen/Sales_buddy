@@ -59,6 +59,7 @@
     <table class="table table-hover">
       <thead>
         <tr>
+          <th>數位</th>
           <th>d+</th>
           <th>HIS</th>
           <th>股東</th>
@@ -77,6 +78,7 @@
       <tbody>
         <% clients.forEach(client => { %>
           <tr>
+            <td class="text-center"><span class="status-dot <%= client.isDigital ? 'dot-on-digital' : 'dot-off' %>"></span></td>
             <%
               let dplusDotClass = 'dot-off';
               let dplusTitle = '';

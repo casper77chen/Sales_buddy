@@ -111,6 +111,11 @@ body {
   border-radius: 50%;
 }
 
+.dot-on-digital {
+  background-color: #06B6D4;
+  box-shadow: 0 0 6px #06B6D4;
+}
+
 .dot-on-dplus {
   background-color: #7DD3FC;
   box-shadow: 0 0 6px #7DD3FC;

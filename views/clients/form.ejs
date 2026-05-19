@@ -8,6 +8,11 @@
         <form action="<%= client ? '/clients/' + client._id + '?_method=PUT' : '/clients' %>" method="POST">
           <div class="mb-3 d-flex gap-4 align-items-center">
             <div class="form-check">
+              <input type="checkbox" name="isDigital" id="isDigital" class="form-check-input"
+                <%= client && client.isDigital ? 'checked' : '' %>>
+              <label for="isDigital" class="form-check-label">數位</label>
+            </div>
+            <div class="form-check">
               <input type="checkbox" name="hasDPlus" id="hasDPlus" class="form-check-input"
                 <%= client && client.hasDPlus ? 'checked' : '' %>
                 onchange="document.getElementById('dPlusSection').style.display = this.checked ? 'flex' : 'none'">
