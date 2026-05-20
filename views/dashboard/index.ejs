@@ -161,6 +161,29 @@
             <div><strong>電話：</strong><span id="ciPhone"></span></div>
             <div><strong>地址：</strong><span id="ciAddress"></span></div>
           </div>
+          <!-- 快速新增客戶 -->
+          <div id="quickCreateClient" class="card border-primary mb-3" style="display:none;">
+            <div class="card-header bg-primary text-white py-2">
+              <i class="bi bi-plus-circle"></i> 新增客戶
+            </div>
+            <div class="card-body">
+              <div class="mb-2">
+                <label class="form-label form-label-sm mb-1">診所名稱 <span class="text-danger">*</span></label>
+                <input type="text" id="qcName" class="form-control form-control-sm">
+              </div>
+              <div class="mb-2">
+                <label class="form-label form-label-sm mb-1">電話</label>
+                <input type="text" id="qcPhone" class="form-control form-control-sm">
+              </div>
+              <div class="mb-2">
+                <label class="form-label form-label-sm mb-1">地址</label>
+                <input type="text" id="qcAddress" class="form-control form-control-sm">
+              </div>
+              <button type="button" class="btn btn-primary btn-sm w-100" id="qcSubmitBtn" onclick="quickCreateClient()">
+                <i class="bi bi-check-lg"></i> 建立並選擇此客戶
+              </button>
+            </div>
+          </div>
           <div class="mb-3">
             <label for="addContent" class="form-label">拜訪事項</label>
             <textarea name="content" id="addContent" class="form-control" rows="3" placeholder="預計拜訪的事項..."></textarea>

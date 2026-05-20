@@ -8,6 +8,7 @@ function openAddModal(date, slot) {
   document.getElementById('clientResults').innerHTML = '';
   document.getElementById('clientInfo').style.display = 'none';
   document.getElementById('addSubmitBtn').disabled = true;
+  document.getElementById('quickCreateClient').style.display = 'none';
 
   new bootstrap.Modal(document.getElementById('addVisitModal')).show();
 }
@@ -21,6 +22,7 @@ document.getElementById('clientSearch').addEventListener('input', function () {
 
   if (q.length < 1) {
     resultsDiv.innerHTML = '';
+    document.getElementById('quickCreateClient').style.display = 'none';
     return;
   }
 
@@ -29,9 +31,13 @@ document.getElementById('clientSearch').addEventListener('input', function () {
     const clients = await res.json();
 
     if (clients.length === 0) {
-      resultsDiv.innerHTML = '<div class="list-group-item text-muted">找不到符合的客戶</div>';
+      resultsDiv.innerHTML = `
+        <button type="button" class="list-group-item list-group-item-action text-primary fw-bold" onclick="showQuickCreate()">
+          <i class="bi bi-plus-circle"></i> 找不到「${q}」，點此新增客戶
+        </button>`;
       return;
     }
+    document.getElementById('quickCreateClient').style.display = 'none';
 
     resultsDiv.innerHTML = clients.map(c => `
       <button type="button" class="list-group-item list-group-item-action"
@@ -53,6 +59,52 @@ function selectClient(id, name, phone, address) {
   document.getElementById('ciPhone').textContent = phone || '-';
   document.getElementById('ciAddress').textContent = address || '-';
   document.getElementById('clientInfo').style.display = 'block';
+}
+
+// 快速新增客戶
+function showQuickCreate() {
+  const searchVal = document.getElementById('clientSearch').value.trim();
+  document.getElementById('qcName').value = searchVal;
+  document.getElementById('qcPhone').value = '';
+  document.getElementById('qcAddress').value = '';
+  document.getElementById('quickCreateClient').style.display = 'block';
+  document.getElementById('clientResults').innerHTML = '';
+  document.getElementById('qcName').focus();
+}
+
+async function quickCreateClient() {
+  const name = document.getElementById('qcName').value.trim();
+  const phone = document.getElementById('qcPhone').value.trim();
+  const address = document.getElementById('qcAddress').value.trim();
+
+  if (!name) {
+    alert('請填寫診所名稱');
+    return;
+  }
+
+  const btn = document.getElementById('qcSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> 建立中...';
+
+  try {
+    const res = await fetch('/api/clients/quick-create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, phone, address }),
+    });
+    const client = await res.json();
+    if (client.error) {
+      alert(client.error);
+      return;
+    }
+    selectClient(client._id, client.name, client.phone, client.address);
+    document.getElementById('quickCreateClient').style.display = 'none';
+  } catch (err) {
+    alert('建立失敗，請稍後再試');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-check-lg"></i> 建立並選擇此客戶';
+  }
 }
 
 // 編輯拜訪 Modal
