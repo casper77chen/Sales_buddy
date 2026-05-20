@@ -112,7 +112,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
   });
 
   req.flash('success_msg', '油資已送審，等待主管審核');
-  res.redirect('/mileage');
+  res.redirect('/');
 });
 
 // 審核油資
