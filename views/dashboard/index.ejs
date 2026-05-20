@@ -78,10 +78,10 @@
                     <div class="visit-card-name"><i class="bi bi-google"></i> <%= v.content ? v.content.split('\n')[0] : 'Google 事件' %></div>
                   </div>
                 <% } else { %>
-                  <div class="visit-card visit-<%= v.status %>"
+                  <div class="visit-card <%= v.client ? 'visit-' + v.status : 'visit-nonvisit' %>"
                     onclick="event.stopPropagation(); openEditModal('<%= v._id %>')"
                     style="<%= dur > 1 ? 'height:' + (dur * 61 - 5) + 'px; position:relative; z-index:2;' : '' %>">
-                    <div class="visit-card-name"><%= v.client ? v.client.name : (v.content ? v.content.split('\n')[0] : '未知客戶') %></div>
+                    <div class="visit-card-name"><%= v.client ? v.client.name : (v.content ? v.content.split('\n')[0] : '工作事項') %></div>
                     <span class="badge badge-<%= v.status %>">
                       <%= v.status === 'scheduled' ? '預排' : v.status === 'visited' ? '已訪' : '取消' %>
                     </span>
@@ -146,13 +146,19 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-plus-circle"></i> 新增拜訪行程</h5>
+        <h5 class="modal-title"><i class="bi bi-plus-circle"></i> <span id="addModalTitle">新增拜訪行程</span></h5>
+        <div class="ms-auto me-2">
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleVisitType" onclick="toggleAddMode()">
+            <i class="bi bi-arrow-left-right"></i> <span id="toggleLabel">非拜訪行程</span>
+          </button>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <form action="/visits" method="POST">
+      <form action="/visits" method="POST" onsubmit="if(document.getElementById('addIsNonVisit').value==='1'){document.getElementById('addContent').value=document.getElementById('addNonVisitContent').value;}">
         <div class="modal-body">
           <input type="hidden" name="date" id="addDate">
           <input type="hidden" name="timeSlot" id="addTimeSlot">
+          <input type="hidden" name="isNonVisit" id="addIsNonVisit" value="">
           <div class="row mb-3">
             <div class="col-8">
               <label class="form-label">日期 / 時間</label>
@@ -168,43 +174,53 @@
               </select>
             </div>
           </div>
-          <div class="mb-3">
-            <label for="clientSearch" class="form-label">選擇客戶（診所）</label>
-            <input type="text" id="clientSearch" class="form-control" placeholder="輸入名稱搜尋..." autocomplete="off">
-            <input type="hidden" name="clientId" id="addClientId">
-            <div id="clientResults" class="list-group mt-1" style="position:absolute; z-index:1000; width:calc(100% - 2rem);"></div>
-          </div>
-          <div id="clientInfo" class="alert alert-light" style="display:none;">
-            <div><strong>客戶：</strong><span id="ciName"></span></div>
-            <div><strong>電話：</strong><span id="ciPhone"></span></div>
-            <div><strong>地址：</strong><span id="ciAddress"></span></div>
-          </div>
-          <!-- 快速新增客戶 -->
-          <div id="quickCreateClient" class="card border-primary mb-3" style="display:none;">
-            <div class="card-header bg-primary text-white py-2">
-              <i class="bi bi-plus-circle"></i> 新增客戶
+          <!-- 拜訪行程區塊 -->
+          <div id="visitSection">
+            <div class="mb-3">
+              <label for="clientSearch" class="form-label">選擇客戶（診所）</label>
+              <input type="text" id="clientSearch" class="form-control" placeholder="輸入名稱搜尋..." autocomplete="off">
+              <input type="hidden" name="clientId" id="addClientId">
+              <div id="clientResults" class="list-group mt-1" style="position:absolute; z-index:1000; width:calc(100% - 2rem);"></div>
             </div>
-            <div class="card-body">
-              <div class="mb-2">
-                <label class="form-label form-label-sm mb-1">診所名稱 <span class="text-danger">*</span></label>
-                <input type="text" id="qcName" class="form-control form-control-sm">
+            <div id="clientInfo" class="alert alert-light" style="display:none;">
+              <div><strong>客戶：</strong><span id="ciName"></span></div>
+              <div><strong>電話：</strong><span id="ciPhone"></span></div>
+              <div><strong>地址：</strong><span id="ciAddress"></span></div>
+            </div>
+            <!-- 快速新增客戶 -->
+            <div id="quickCreateClient" class="card border-primary mb-3" style="display:none;">
+              <div class="card-header bg-primary text-white py-2">
+                <i class="bi bi-plus-circle"></i> 新增客戶
               </div>
-              <div class="mb-2">
-                <label class="form-label form-label-sm mb-1">電話</label>
-                <input type="text" id="qcPhone" class="form-control form-control-sm">
+              <div class="card-body">
+                <div class="mb-2">
+                  <label class="form-label form-label-sm mb-1">診所名稱 <span class="text-danger">*</span></label>
+                  <input type="text" id="qcName" class="form-control form-control-sm">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label form-label-sm mb-1">電話</label>
+                  <input type="text" id="qcPhone" class="form-control form-control-sm">
+                </div>
+                <div class="mb-2">
+                  <label class="form-label form-label-sm mb-1">地址</label>
+                  <input type="text" id="qcAddress" class="form-control form-control-sm">
+                </div>
+                <button type="button" class="btn btn-primary btn-sm w-100" id="qcSubmitBtn" onclick="quickCreateClient()">
+                  <i class="bi bi-check-lg"></i> 建立並選擇此客戶
+                </button>
               </div>
-              <div class="mb-2">
-                <label class="form-label form-label-sm mb-1">地址</label>
-                <input type="text" id="qcAddress" class="form-control form-control-sm">
-              </div>
-              <button type="button" class="btn btn-primary btn-sm w-100" id="qcSubmitBtn" onclick="quickCreateClient()">
-                <i class="bi bi-check-lg"></i> 建立並選擇此客戶
-              </button>
+            </div>
+            <div class="mb-3">
+              <label for="addContent" class="form-label">拜訪事項</label>
+              <textarea name="content" id="addContent" class="form-control" rows="3" placeholder="預計拜訪的事項..."></textarea>
             </div>
           </div>
-          <div class="mb-3">
-            <label for="addContent" class="form-label">拜訪事項</label>
-            <textarea name="content" id="addContent" class="form-control" rows="3" placeholder="預計拜訪的事項..."></textarea>
+          <!-- 非拜訪行程區塊 -->
+          <div id="nonVisitSection" style="display:none;">
+            <div class="mb-3">
+              <label for="addNonVisitContent" class="form-label">工作事項</label>
+              <textarea id="addNonVisitContent" class="form-control" rows="4" placeholder="例：開會、教育訓練、行政事務..."></textarea>
+            </div>
           </div>
         </div>
         <div class="modal-footer">

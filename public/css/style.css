@@ -245,6 +245,11 @@ body {
   color: #7C3AED;
 }
 
+.visit-nonvisit {
+  background-color: #E0F2FE;
+  border-left: 3px solid #0284C7;
+}
+
 /* Month view */
 .month-table {
   table-layout: fixed;

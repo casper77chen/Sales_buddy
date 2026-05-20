@@ -5,16 +5,21 @@ const { ensureAuthenticated } = require('../middleware/auth');
 
 // 新增拜訪
 router.post('/', ensureAuthenticated, async (req, res) => {
-  const { clientId, date, timeSlot, content, duration } = req.body;
+  const { clientId, date, timeSlot, content, duration, isNonVisit } = req.body;
 
-  if (!clientId || !date || !timeSlot) {
+  if (!date || !timeSlot) {
     req.flash('error_msg', '請填寫完整資訊');
+    return res.redirect('/');
+  }
+
+  if (!isNonVisit && !clientId) {
+    req.flash('error_msg', '請選擇客戶');
     return res.redirect('/');
   }
 
   await Visit.create({
     salesRep: req.user._id,
-    client: clientId,
+    client: isNonVisit ? null : clientId,
     date: new Date(date + 'T00:00:00'),
     timeSlot,
     duration: parseInt(duration) || 1,

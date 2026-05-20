@@ -1,3 +1,32 @@
+// 切換拜訪/非拜訪模式
+let isNonVisitMode = false;
+
+function toggleAddMode() {
+  isNonVisitMode = !isNonVisitMode;
+  const visitSection = document.getElementById('visitSection');
+  const nonVisitSection = document.getElementById('nonVisitSection');
+  const title = document.getElementById('addModalTitle');
+  const toggleLabel = document.getElementById('toggleLabel');
+  const submitBtn = document.getElementById('addSubmitBtn');
+  const isNonVisitInput = document.getElementById('addIsNonVisit');
+
+  if (isNonVisitMode) {
+    visitSection.style.display = 'none';
+    nonVisitSection.style.display = 'block';
+    title.textContent = '新增非拜訪行程';
+    toggleLabel.textContent = '拜訪行程';
+    isNonVisitInput.value = '1';
+    submitBtn.disabled = false;
+  } else {
+    visitSection.style.display = 'block';
+    nonVisitSection.style.display = 'none';
+    title.textContent = '新增拜訪行程';
+    toggleLabel.textContent = '非拜訪行程';
+    isNonVisitInput.value = '';
+    submitBtn.disabled = !document.getElementById('addClientId').value;
+  }
+}
+
 // 新增拜訪 Modal
 function openAddModal(date, slot) {
   document.getElementById('addDate').value = date;
@@ -9,6 +38,15 @@ function openAddModal(date, slot) {
   document.getElementById('clientInfo').style.display = 'none';
   document.getElementById('addSubmitBtn').disabled = true;
   document.getElementById('quickCreateClient').style.display = 'none';
+  document.getElementById('addDuration').value = '1';
+  document.getElementById('addNonVisitContent').value = '';
+  // 重置為拜訪模式
+  isNonVisitMode = false;
+  document.getElementById('visitSection').style.display = 'block';
+  document.getElementById('nonVisitSection').style.display = 'none';
+  document.getElementById('addModalTitle').textContent = '新增拜訪行程';
+  document.getElementById('toggleLabel').textContent = '非拜訪行程';
+  document.getElementById('addIsNonVisit').value = '';
 
   new bootstrap.Modal(document.getElementById('addVisitModal')).show();
 }
