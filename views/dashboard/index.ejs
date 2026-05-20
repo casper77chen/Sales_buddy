@@ -246,11 +246,11 @@
         <p class="text-muted mb-3">拜訪紀錄已儲存，是否申報此次交通油資？</p>
         <div class="mb-3">
           <label class="form-label fw-bold"><i class="bi bi-geo-alt text-primary"></i> 出發地</label>
-          <p id="mileageOrigin" class="border rounded p-2 bg-light mb-0">-</p>
+          <input type="text" id="mileageOrigin" class="form-control" value="">
         </div>
         <div class="mb-3">
           <label class="form-label fw-bold"><i class="bi bi-geo-alt-fill text-danger"></i> 拜訪地</label>
-          <p id="mileageDestination" class="border rounded p-2 bg-light mb-0">-</p>
+          <input type="text" id="mileageDestination" class="form-control" value="">
         </div>
       </div>
       <div class="modal-footer">
@@ -266,17 +266,32 @@
   const urlParams = new URLSearchParams(window.location.search);
   const showMileageId = urlParams.get('showMileage');
   if (showMileageId) {
-    document.getElementById('mileageLink').href = '/mileage/confirm?visitId=' + showMileageId;
+    const originInput = document.getElementById('mileageOrigin');
+    const destInput = document.getElementById('mileageDestination');
+    const mileageLink = document.getElementById('mileageLink');
+    const defaultOrigin = '<%= process.env.COMPANY_ADDRESS || "台北市羅斯福路三段136號" %>';
+
+    function updateMileageLink() {
+      const origin = encodeURIComponent(originInput.value);
+      const dest = encodeURIComponent(destInput.value);
+      mileageLink.href = '/mileage/confirm?visitId=' + showMileageId + '&origin=' + origin + '&destination=' + dest;
+    }
+
+    originInput.addEventListener('input', updateMileageLink);
+    destInput.addEventListener('input', updateMileageLink);
+
     // 取得拜訪詳情填入 modal
     fetch('/visits/' + showMileageId + '/json')
       .then(r => r.json())
       .then(visit => {
-        document.getElementById('mileageOrigin').textContent = '<%= process.env.COMPANY_ADDRESS || "台北市羅斯福路三段136號" %>';
-        document.getElementById('mileageDestination').textContent = visit.client && visit.client.address ? visit.client.address : '(未填寫地址)';
+        originInput.value = defaultOrigin;
+        destInput.value = visit.client && visit.client.address ? visit.client.address : '';
+        updateMileageLink();
         new bootstrap.Modal(document.getElementById('mileagePromptModal')).show();
       })
       .catch(() => {
-        document.getElementById('mileageOrigin').textContent = '<%= process.env.COMPANY_ADDRESS || "台北市羅斯福路三段136號" %>';
+        originInput.value = defaultOrigin;
+        updateMileageLink();
         new bootstrap.Modal(document.getElementById('mileagePromptModal')).show();
       });
   }

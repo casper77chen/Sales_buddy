@@ -65,8 +65,8 @@ router.get('/confirm', ensureAuthenticated, async (req, res) => {
     return res.redirect('/mileage');
   }
 
-  const origin = process.env.COMPANY_ADDRESS || '台北市';
-  const destination = visit.client ? visit.client.address : '';
+  const origin = req.query.origin || process.env.COMPANY_ADDRESS || '台北市';
+  const destination = req.query.destination || (visit.client ? visit.client.address : '');
 
   let distance = { distanceKm: 0, distanceText: '-', durationText: '-' };
   if (destination) {
