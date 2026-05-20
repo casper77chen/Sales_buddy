@@ -28,6 +28,7 @@
             <select name="role" id="role" class="form-select">
               <option value="sales" <%= (typeof role !== 'undefined' && role === 'sales') ? 'selected' : '' %>>業務</option>
               <option value="manager" <%= (typeof role !== 'undefined' && role === 'manager') ? 'selected' : '' %>>主管</option>
+              <option value="gm" <%= (typeof role !== 'undefined' && role === 'gm') ? 'selected' : '' %>>總經理</option>
             </select>
           </div>
           <div class="mb-3">

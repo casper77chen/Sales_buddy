@@ -20,8 +20,8 @@ router.get('/', ensureAuthenticated, ensureManager, async (req, res) => {
   sunday.setDate(monday.getDate() + 6);
   sunday.setHours(23, 59, 59, 999);
 
-  // 取得所屬業務（admin 看全部，manager 只看自己管轄的）
-  const repQuery = req.user.role === 'admin'
+  // 取得所屬業務（admin/gm 看全部，manager 只看自己管轄的）
+  const repQuery = ['admin', 'gm'].includes(req.user.role)
     ? { role: 'sales' }
     : { role: 'sales', manager: req.user._id };
   const salesReps = await User.find(repQuery).select('name email');
@@ -56,7 +56,7 @@ router.get('/', ensureAuthenticated, ensureManager, async (req, res) => {
 
   // 待審油資數量（admin 看全部，manager 只看自己管轄的業務）
   const repIds = salesReps.map(r => r._id);
-  const claimQuery = req.user.role === 'admin'
+  const claimQuery = ['admin', 'gm'].includes(req.user.role)
     ? { status: 'pending' }
     : { status: 'pending', salesRep: { $in: repIds } };
   const pendingClaims = await MileageClaim.countDocuments(claimQuery);
@@ -68,7 +68,7 @@ router.get('/', ensureAuthenticated, ensureManager, async (req, res) => {
 router.get('/claims', ensureAuthenticated, ensureManager, async (req, res) => {
   // admin 看全部，manager 只看自己管轄的業務
   let claimQuery = { status: 'pending' };
-  if (req.user.role !== 'admin') {
+  if (!['admin', 'gm'].includes(req.user.role)) {
     const myReps = await User.find({ role: 'sales', manager: req.user._id }).select('_id');
     claimQuery.salesRep = { $in: myReps.map(r => r._id) };
   }
@@ -114,7 +114,7 @@ router.put('/claims/:id', ensureAuthenticated, ensureManager, async (req, res) =
   }
 
   req.flash('success_msg', status === 'approved' ? '油資已核准' : '油資已駁回');
-  res.redirect('/manager/claims');
+  res.redirect('/mileage');
 });
 
 module.exports = router;

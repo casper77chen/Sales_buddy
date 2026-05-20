@@ -102,7 +102,7 @@
                 value="<%= client ? client.facebook || '' : '' %>">
             </div>
           </div>
-          <% if (user.role === 'admin' || user.role === 'manager') { %>
+          <% if (['admin', 'gm', 'manager'].includes(user.role)) { %>
           <div class="mb-3">
             <label for="assignedTo" class="form-label">負責業務</label>
             <select name="assignedTo" id="assignedTo" class="form-select">

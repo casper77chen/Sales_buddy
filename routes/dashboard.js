@@ -62,8 +62,8 @@ async function getTargetRep(req) {
   let salesReps = [];
   const repId = req.query.rep || null;
 
-  if (['admin', 'manager'].includes(req.user.role)) {
-    salesReps = await User.find({ role: { $in: ['sales', 'manager', 'admin'] } }).select('name email role').sort({ name: 1 });
+  if (['admin', 'gm', 'manager'].includes(req.user.role)) {
+    salesReps = await User.find({ role: { $in: ['sales', 'manager', 'gm', 'admin'] } }).select('name email role').sort({ name: 1 });
     if (repId) targetRepId = repId;
   }
 
@@ -133,7 +133,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     currentWeek: formatDate(monday),
     selectedRep,
     salesReps,
-    isManager: ['admin', 'manager'].includes(req.user.role),
+    isManager: ['admin', 'gm', 'manager'].includes(req.user.role),
     weekLabel: `W${String(weekNumber).padStart(2, '0')}`,
     year,
   });
@@ -207,7 +207,7 @@ router.get('/month', ensureAuthenticated, async (req, res) => {
     monthLabel: `${year} ${monthNames[month - 1]}`,
     selectedRep,
     salesReps,
-    isManager: ['admin', 'manager'].includes(req.user.role),
+    isManager: ['admin', 'gm', 'manager'].includes(req.user.role),
     year,
   });
 });

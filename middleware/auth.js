@@ -16,7 +16,15 @@ module.exports = {
   },
 
   ensureManager(req, res, next) {
-    if (req.isAuthenticated() && ['admin', 'manager'].includes(req.user.role)) {
+    if (req.isAuthenticated() && ['admin', 'gm', 'manager'].includes(req.user.role)) {
+      return next();
+    }
+    req.flash('error_msg', '權限不足');
+    res.redirect('/');
+  },
+
+  ensureGM(req, res, next) {
+    if (req.isAuthenticated() && ['admin', 'gm'].includes(req.user.role)) {
       return next();
     }
     req.flash('error_msg', '權限不足');

@@ -6,7 +6,7 @@ const { ensureAuthenticated, ensureAdmin } = require('../middleware/auth');
 // 使用者管理
 router.get('/', ensureAuthenticated, ensureAdmin, async (req, res) => {
   const users = await User.find().sort({ createdAt: -1 });
-  const managers = await User.find({ role: { $in: ['manager', 'admin'] } }).select('name');
+  const managers = await User.find({ role: { $in: ['manager', 'gm', 'admin'] } }).select('name');
   res.render('admin/users', { users, managers });
 });
 

@@ -16,9 +16,9 @@
             <a class="nav-link" href="/clients"><i class="bi bi-building"></i> 客戶管理</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/mileage"><i class="bi bi-fuel-pump"></i> 油資申報</a>
+            <a class="nav-link" href="/mileage"><i class="bi bi-fuel-pump"></i> <%= ['admin', 'gm', 'manager'].includes(user.role) ? '油資申報/審查' : '油資申報' %></a>
           </li>
-          <% if (user.role === 'manager' || user.role === 'admin') { %>
+          <% if (['admin', 'gm', 'manager'].includes(user.role)) { %>
             <li class="nav-item">
               <a class="nav-link" href="/manager"><i class="bi bi-speedometer2"></i> 主管面板</a>
             </li>
@@ -31,7 +31,7 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
               <i class="bi bi-person-circle"></i> <%= user.name %>
-              <span class="badge bg-light text-dark ms-1"><%= user.role === 'admin' ? 'Admin' : user.role === 'manager' ? '主管' : '業務' %></span>
+              <span class="badge bg-light text-dark ms-1"><%= user.role === 'admin' ? 'Admin' : user.role === 'gm' ? '總經理' : user.role === 'manager' ? '主管' : '業務' %></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear"></i> 個人設定</a></li>

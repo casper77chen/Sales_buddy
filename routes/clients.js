@@ -76,14 +76,14 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   // 取得所有縣市和行政區供篩選
   const cities = await Client.distinct('city');
   const districts = cityFilter ? await Client.distinct('district', { city: cityFilter }) : [];
-  const salesReps = await User.find({ role: { $in: ['sales', 'manager'] }, isApproved: true }).select('name').sort({ name: 1 });
+  const salesReps = await User.find({ role: { $in: ['sales', 'manager', 'gm'] }, isApproved: true }).select('name').sort({ name: 1 });
 
   res.render('clients/index', { clients, search, cityFilter, districtFilter, repFilter, cities, districts, salesReps });
 });
 
 // 新增客戶頁
 router.get('/new', ensureAuthenticated, async (req, res) => {
-  const salesReps = await User.find({ $or: [{ role: { $in: ['sales', 'manager'] }, isApproved: true }, { role: 'admin' }] }).select('name').sort({ name: 1 });
+  const salesReps = await User.find({ $or: [{ role: { $in: ['sales', 'manager', 'gm'] }, isApproved: true }, { role: 'admin' }] }).select('name').sort({ name: 1 });
   res.render('clients/form', { client: null, salesReps });
 });
 
@@ -117,7 +117,7 @@ router.get('/:id/edit', ensureAuthenticated, async (req, res) => {
     req.flash('error_msg', '找不到此客戶');
     return res.redirect('/clients');
   }
-  const salesReps = await User.find({ $or: [{ role: { $in: ['sales', 'manager'] }, isApproved: true }, { role: 'admin' }] }).select('name').sort({ name: 1 });
+  const salesReps = await User.find({ $or: [{ role: { $in: ['sales', 'manager', 'gm'] }, isApproved: true }, { role: 'admin' }] }).select('name').sort({ name: 1 });
   res.render('clients/form', { client, salesReps });
 });
 

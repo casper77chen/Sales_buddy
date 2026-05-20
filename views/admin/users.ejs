@@ -24,7 +24,7 @@
             <tr>
               <td><strong><%= u.name %></strong></td>
               <td><%= u.email %></td>
-              <td><%= u.role === 'manager' ? '主管' : '業務' %></td>
+              <td><%= u.role === 'gm' ? '總經理' : u.role === 'manager' ? '主管' : '業務' %></td>
               <td><%= u.createdAt.toISOString().split('T')[0] %></td>
               <td>
                 <form action="/admin/users/<%= u._id %>/approve?_method=PUT" method="POST" class="d-inline">
@@ -67,12 +67,13 @@
                 onchange="this.form.submit()">
                 <option value="sales" <%= u.role === 'sales' ? 'selected' : '' %>>業務</option>
                 <option value="manager" <%= u.role === 'manager' ? 'selected' : '' %>>主管</option>
+                <option value="gm" <%= u.role === 'gm' ? 'selected' : '' %>>總經理</option>
                 <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
               </select>
             </form>
           </td>
           <td>
-            <% if (u.role === 'sales') { %>
+            <% if (['sales', 'manager'].includes(u.role)) { %>
               <form action="/admin/users/<%= u._id %>?_method=PUT" method="POST" class="d-inline">
                 <select name="manager" class="form-select form-select-sm d-inline" style="width: auto;"
                   onchange="this.form.submit()">

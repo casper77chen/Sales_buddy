@@ -1,9 +1,62 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h2><i class="bi bi-fuel-pump"></i> 我的油資申報</h2>
+  <h2><i class="bi bi-fuel-pump"></i> <%= canReview ? '油資申報/審查' : '我的油資申報' %></h2>
 </div>
 
+<% if (canReview && pendingClaims.length > 0) { %>
+  <h4><i class="bi bi-clipboard-check"></i> 待審油資 <span class="badge bg-danger"><%= pendingClaims.length %></span></h4>
+  <div class="table-responsive mb-4">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>申報人</th>
+          <th>日期</th>
+          <th>客戶</th>
+          <th>出發地</th>
+          <th>目的地</th>
+          <th>距離</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% pendingClaims.forEach(claim => { %>
+          <tr>
+            <td><strong><%= claim.salesRep ? claim.salesRep.name : '-' %></strong></td>
+            <td><%= claim.createdAt.toISOString().split('T')[0] %></td>
+            <td><%= claim.visit && claim.visit.client ? claim.visit.client.name : '-' %></td>
+            <td><%= claim.originAddress %></td>
+            <td><%= claim.destinationAddress %></td>
+            <td><%= claim.distanceText || claim.distanceKm + ' km' %></td>
+            <td>
+              <form action="/mileage/<%= claim._id %>?_method=PUT" method="POST" class="d-inline">
+                <input type="hidden" name="action" value="approve">
+                <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> 核准</button>
+              </form>
+              <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="collapse" data-bs-target="#reject-<%= claim._id %>">
+                <i class="bi bi-x-lg"></i> 駁回
+              </button>
+              <div class="collapse mt-2" id="reject-<%= claim._id %>">
+                <form action="/mileage/<%= claim._id %>?_method=PUT" method="POST">
+                  <input type="hidden" name="action" value="reject">
+                  <div class="input-group input-group-sm">
+                    <input type="text" name="reviewNote" class="form-control" placeholder="駁回原因...">
+                    <button type="submit" class="btn btn-danger">確認駁回</button>
+                  </div>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <hr>
+<% } else if (canReview) { %>
+  <div class="alert alert-info mb-4"><i class="bi bi-info-circle"></i> 目前沒有待審油資</div>
+<% } %>
+
+<h4><i class="bi bi-list-check"></i> 我的油資申報</h4>
 <% if (claims.length === 0) { %>
-  <div class="text-center text-muted mt-5">
+  <div class="text-center text-muted mt-4">
     <i class="bi bi-fuel-pump" style="font-size: 3rem;"></i>
     <p class="mt-2">尚無油資申報記錄</p>
   </div>

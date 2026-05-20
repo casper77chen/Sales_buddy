@@ -55,7 +55,7 @@ router.post('/register', async (req, res) => {
     const hash = await bcrypt.hash(password, salt);
 
     // Admin 角色由 ADMIN_EMAIL 決定，其餘依選擇
-    let userRole = role === 'manager' ? 'manager' : 'sales';
+    let userRole = ['manager', 'gm'].includes(role) ? role : 'sales';
     const isAdmin = email === process.env.ADMIN_EMAIL;
     if (isAdmin) {
       userRole = 'admin';
