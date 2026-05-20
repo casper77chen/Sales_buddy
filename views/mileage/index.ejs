@@ -4,51 +4,84 @@
 
 <% if (canReview && pendingClaims.length > 0) { %>
   <h4><i class="bi bi-clipboard-check"></i> 待審油資 <span class="badge bg-danger"><%= pendingClaims.length %></span></h4>
-  <div class="table-responsive mb-4">
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>申報人</th>
-          <th>日期</th>
-          <th>客戶</th>
-          <th>出發地</th>
-          <th>目的地</th>
-          <th>距離</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% pendingClaims.forEach(claim => { %>
-          <tr>
-            <td><strong><%= claim.salesRep ? claim.salesRep.name : '-' %></strong></td>
-            <td><%= claim.createdAt.toISOString().split('T')[0] %></td>
-            <td><%= claim.visit && claim.visit.client ? claim.visit.client.name : '-' %></td>
-            <td><%= claim.originAddress %></td>
-            <td><%= claim.destinationAddress %></td>
-            <td><%= claim.distanceText || claim.distanceKm + ' km' %></td>
-            <td>
-              <form action="/mileage/<%= claim._id %>?_method=PUT" method="POST" class="d-inline">
-                <input type="hidden" name="action" value="approve">
-                <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> 核准</button>
-              </form>
-              <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="collapse" data-bs-target="#reject-<%= claim._id %>">
-                <i class="bi bi-x-lg"></i> 駁回
-              </button>
-              <div class="collapse mt-2" id="reject-<%= claim._id %>">
-                <form action="/mileage/<%= claim._id %>?_method=PUT" method="POST">
-                  <input type="hidden" name="action" value="reject">
-                  <div class="input-group input-group-sm">
-                    <input type="text" name="reviewNote" class="form-control" placeholder="駁回原因...">
-                    <button type="submit" class="btn btn-danger">確認駁回</button>
-                  </div>
-                </form>
-              </div>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
+
+  <%
+    // 依申報人分組
+    const grouped = {};
+    pendingClaims.forEach(claim => {
+      const repId = claim.salesRep ? claim.salesRep._id.toString() : 'unknown';
+      if (!grouped[repId]) {
+        grouped[repId] = { name: claim.salesRep ? claim.salesRep.name : '-', claims: [] };
+      }
+      grouped[repId].claims.push(claim);
+    });
+  %>
+
+  <form action="/mileage/batch-approve" method="POST" id="batchForm">
+    <% Object.keys(grouped).forEach((repId, idx) => { %>
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center" style="cursor: pointer;"
+          data-bs-toggle="collapse" data-bs-target="#rep-<%= idx %>">
+          <div>
+            <strong><%= grouped[repId].name %></strong>
+            <span class="badge bg-secondary ms-2"><%= grouped[repId].claims.length %> 筆</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button type="submit" class="btn btn-sm btn-success" onclick="event.stopPropagation(); selectGroup(<%= idx %>);">
+              <i class="bi bi-check-all"></i> 全部核准
+            </button>
+            <i class="bi bi-chevron-down"></i>
+          </div>
+        </div>
+        <div class="collapse" id="rep-<%= idx %>">
+          <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>客戶</th>
+                  <th>出發地</th>
+                  <th>目的地</th>
+                  <th>距離</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% grouped[repId].claims.forEach(claim => { %>
+                  <tr>
+                    <td><%= claim.createdAt.toISOString().split('T')[0] %></td>
+                    <td><%= claim.visit && claim.visit.client ? claim.visit.client.name : '-' %></td>
+                    <td><small><%= claim.originAddress %></small></td>
+                    <td><small><%= claim.destinationAddress %></small></td>
+                    <td><%= claim.distanceText || claim.distanceKm + ' km' %></td>
+                    <td>
+                      <input type="checkbox" name="claimIds" value="<%= claim._id %>" class="group-<%= idx %> d-none">
+                      <form action="/mileage/<%= claim._id %>?_method=PUT" method="POST" class="d-inline">
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="btn btn-sm btn-outline-success"><i class="bi bi-check-lg"></i></button>
+                      </form>
+                      <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#reject-<%= claim._id %>">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                      <div class="collapse mt-2" id="reject-<%= claim._id %>">
+                        <form action="/mileage/<%= claim._id %>?_method=PUT" method="POST">
+                          <input type="hidden" name="action" value="reject">
+                          <div class="input-group input-group-sm">
+                            <input type="text" name="reviewNote" class="form-control" placeholder="駁回原因...">
+                            <button type="submit" class="btn btn-danger">確認駁回</button>
+                          </div>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </form>
   <hr>
 <% } else if (canReview) { %>
   <div class="alert alert-info mb-4"><i class="bi bi-info-circle"></i> 目前沒有待審油資</div>
@@ -97,4 +130,13 @@
       </tbody>
     </table>
   </div>
+<% } %>
+
+<% if (canReview && pendingClaims.length > 0) { %>
+<script>
+function selectGroup(idx) {
+  document.querySelectorAll('.group-' + idx).forEach(cb => cb.checked = true);
+  document.getElementById('batchForm').submit();
+}
+</script>
 <% } %>

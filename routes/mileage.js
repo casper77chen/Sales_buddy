@@ -155,4 +155,55 @@ router.put('/:id', ensureAuthenticated, async (req, res) => {
   res.redirect('/mileage');
 });
 
+// 批次核准油資
+router.post('/batch-approve', ensureAuthenticated, async (req, res) => {
+  const role = req.user.role;
+  if (!['admin', 'gm', 'manager'].includes(role)) {
+    req.flash('error_msg', '權限不足');
+    return res.redirect('/mileage');
+  }
+
+  const ids = req.body.claimIds;
+  if (!ids || ids.length === 0) {
+    req.flash('error_msg', '未選擇任何油資申報');
+    return res.redirect('/mileage');
+  }
+
+  const claimIds = Array.isArray(ids) ? ids : [ids];
+
+  const claims = await MileageClaim.find({ _id: { $in: claimIds }, status: 'pending' })
+    .populate('salesRep', 'name email')
+    .populate({ path: 'visit', populate: { path: 'client', select: 'name address' } });
+
+  for (const claim of claims) {
+    claim.status = 'approved';
+    claim.reviewedBy = req.user._id;
+    claim.reviewedAt = Date.now();
+    await claim.save();
+
+    if (process.env.FINANCE_EMAIL) {
+      const clientName = claim.visit && claim.visit.client ? claim.visit.client.name : '未知';
+      await sendMail({
+        to: process.env.FINANCE_EMAIL,
+        subject: `【油資核准通知】${claim.salesRep.name} - ${clientName}`,
+        html: `
+          <h2>油資申報已核准</h2>
+          <table style="border-collapse:collapse; margin:10px 0;">
+            <tr><td style="padding:5px 15px 5px 0; font-weight:bold;">業務人員</td><td>${claim.salesRep.name}</td></tr>
+            <tr><td style="padding:5px 15px 5px 0; font-weight:bold;">拜訪客戶</td><td>${clientName}</td></tr>
+            <tr><td style="padding:5px 15px 5px 0; font-weight:bold;">出發地</td><td>${claim.originAddress}</td></tr>
+            <tr><td style="padding:5px 15px 5px 0; font-weight:bold;">目的地</td><td>${claim.destinationAddress}</td></tr>
+            <tr><td style="padding:5px 15px 5px 0; font-weight:bold;">距離</td><td>${claim.distanceText || claim.distanceKm + ' km'}</td></tr>
+            <tr><td style="padding:5px 15px 5px 0; font-weight:bold;">審核主管</td><td>${req.user.name}</td></tr>
+          </table>
+          <p style="color:#999; font-size:12px;">此信由 dentall 業務神隊友系統自動發送</p>
+        `,
+      });
+    }
+  }
+
+  req.flash('success_msg', `已核准 ${claims.length} 筆油資申報`);
+  res.redirect('/mileage');
+});
+
 module.exports = router;
