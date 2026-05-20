@@ -20,8 +20,11 @@ router.get('/', ensureAuthenticated, ensureManager, async (req, res) => {
   sunday.setDate(monday.getDate() + 6);
   sunday.setHours(23, 59, 59, 999);
 
-  // 取得所有業務
-  const salesReps = await User.find({ role: 'sales' }).select('name email');
+  // 取得所屬業務（admin 看全部，manager 只看自己管轄的）
+  const repQuery = req.user.role === 'admin'
+    ? { role: 'sales' }
+    : { role: 'sales', manager: req.user._id };
+  const salesReps = await User.find(repQuery).select('name email');
 
   // 各業務本週拜訪統計
   const repStats = await Promise.all(salesReps.map(async (rep) => {
@@ -51,15 +54,25 @@ router.get('/', ensureAuthenticated, ensureManager, async (req, res) => {
     };
   }));
 
-  // 待審油資數量
-  const pendingClaims = await MileageClaim.countDocuments({ status: 'pending' });
+  // 待審油資數量（admin 看全部，manager 只看自己管轄的業務）
+  const repIds = salesReps.map(r => r._id);
+  const claimQuery = req.user.role === 'admin'
+    ? { status: 'pending' }
+    : { status: 'pending', salesRep: { $in: repIds } };
+  const pendingClaims = await MileageClaim.countDocuments(claimQuery);
 
   res.render('manager/dashboard', { repStats, pendingClaims, monday, sunday });
 });
 
 // 待審油資清單
 router.get('/claims', ensureAuthenticated, ensureManager, async (req, res) => {
-  const claims = await MileageClaim.find({ status: 'pending' })
+  // admin 看全部，manager 只看自己管轄的業務
+  let claimQuery = { status: 'pending' };
+  if (req.user.role !== 'admin') {
+    const myReps = await User.find({ role: 'sales', manager: req.user._id }).select('_id');
+    claimQuery.salesRep = { $in: myReps.map(r => r._id) };
+  }
+  const claims = await MileageClaim.find(claimQuery)
     .populate('salesRep', 'name email')
     .populate({ path: 'visit', populate: { path: 'client', select: 'name address' } })
     .sort({ createdAt: 1 });
