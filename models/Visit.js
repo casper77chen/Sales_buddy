@@ -5,6 +5,7 @@ const VisitSchema = new mongoose.Schema({
   client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
   date: { type: Date, required: true },
   timeSlot: { type: String, required: true },
+  duration: { type: Number, default: 1 },
   status: { type: String, enum: ['scheduled', 'visited', 'cancelled'], default: 'scheduled' },
   contactPerson: { type: String },
   content: { type: String },

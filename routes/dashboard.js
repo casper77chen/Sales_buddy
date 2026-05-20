@@ -94,13 +94,26 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     date: { $gte: monday, $lte: sunday },
   }).populate('client', 'name phone address').sort({ date: 1, timeSlot: 1 });
 
-  // 建立 lookup map
+  // 建立 lookup map + 標記被佔用的時段
   const visitMap = {};
+  const occupiedSlots = {};
   visits.forEach(v => {
     const dateKey = formatDate(v.date);
     const key = `${dateKey}_${v.timeSlot}`;
     if (!visitMap[key]) visitMap[key] = [];
     visitMap[key].push(v);
+
+    // 標記此拜訪佔用的後續時段
+    const dur = v.duration || 1;
+    if (dur > 1) {
+      const startHour = parseInt(v.timeSlot.split(':')[0]);
+      for (let h = 1; h < dur; h++) {
+        const occSlot = `${String(startHour + h).padStart(2, '0')}:00`;
+        const occKey = `${dateKey}_${occSlot}`;
+        if (!occupiedSlots[occKey]) occupiedSlots[occKey] = [];
+        occupiedSlots[occKey].push(v._id.toString());
+      }
+    }
   });
 
   // 產生一週日期陣列
@@ -128,6 +141,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     weekDays,
     timeSlots,
     visitMap,
+    occupiedSlots,
     prevWeek: formatDate(prevMonday),
     nextWeek: formatDate(nextMonday),
     currentWeek: formatDate(monday),

@@ -5,7 +5,7 @@ const { ensureAuthenticated } = require('../middleware/auth');
 
 // 新增拜訪
 router.post('/', ensureAuthenticated, async (req, res) => {
-  const { clientId, date, timeSlot, content } = req.body;
+  const { clientId, date, timeSlot, content, duration } = req.body;
 
   if (!clientId || !date || !timeSlot) {
     req.flash('error_msg', '請填寫完整資訊');
@@ -17,6 +17,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
     client: clientId,
     date: new Date(date + 'T00:00:00'),
     timeSlot,
+    duration: parseInt(duration) || 1,
     status: 'scheduled',
     content: content || '',
   });
@@ -55,8 +56,9 @@ router.get('/:id/json', ensureAuthenticated, async (req, res) => {
 
 // 更新拜訪紀錄
 router.put('/:id', ensureAuthenticated, async (req, res) => {
-  const { contactPerson, content, followUp, status } = req.body;
+  const { contactPerson, content, followUp, status, duration } = req.body;
   const update = { contactPerson, content, followUp, updatedAt: Date.now() };
+  if (duration) update.duration = parseInt(duration) || 1;
 
   if (status) {
     update.status = status;

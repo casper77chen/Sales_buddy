@@ -118,6 +118,7 @@ async function openEditModal(visitId) {
   document.getElementById('editClientPhone').textContent = visit.client ? (visit.client.phone || '-') : '-';
   document.getElementById('editClientAddress').textContent = visit.client ? (visit.client.address || '-') : '-';
   document.getElementById('editStatus').value = visit.status;
+  document.getElementById('editDuration').value = visit.duration || 1;
   document.getElementById('editContactPerson').value = visit.contactPerson || '';
   document.getElementById('editContent').value = visit.content || '';
   document.getElementById('editFollowUp').value = visit.followUp || '';
