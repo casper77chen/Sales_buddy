@@ -38,11 +38,16 @@ router.get('/', ensureAuthenticated, ensureManager, async (req, res) => {
       createdBy: rep._id,
       createdAt: { $gte: monday, $lte: sunday },
     });
+    const mileageClaims = await MileageClaim.countDocuments({
+      salesRep: rep._id,
+      createdAt: { $gte: monday, $lte: sunday },
+    });
     return {
       rep,
       totalVisits,
       completedVisits,
       newClients,
+      mileageClaims,
     };
   }));
 

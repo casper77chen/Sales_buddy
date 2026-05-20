@@ -48,6 +48,7 @@
           <th class="text-center">排定行程</th>
           <th class="text-center">已完成拜訪</th>
           <th class="text-center">完成率</th>
+          <th class="text-center">油資申報</th>
           <th class="text-center">新增客戶</th>
           <th>操作</th>
         </tr>
@@ -64,6 +65,7 @@
                 <div class="progress-bar bg-success" style="width: <%= rate %>%"><%= rate %>%</div>
               </div>
             </td>
+            <td class="text-center"><%= item.mileageClaims %></td>
             <td class="text-center"><%= item.newClients %></td>
             <td>
               <a href="/?rep=<%= item.rep._id %>" class="btn btn-sm btn-outline-primary">
