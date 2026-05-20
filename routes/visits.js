@@ -29,7 +29,28 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 router.get('/:id/json', ensureAuthenticated, async (req, res) => {
   const visit = await Visit.findById(req.params.id).populate('client', 'name phone address contactPerson');
   if (!visit) return res.status(404).json({ error: '找不到此拜訪' });
-  res.json(visit);
+
+  const result = visit.toObject();
+
+  // 查詢同天、同業務、時段在此之前的最後一筆已拜訪行程
+  const visitDate = new Date(visit.date);
+  const dayStart = new Date(visitDate); dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(visitDate); dayEnd.setHours(23, 59, 59, 999);
+
+  const prevVisit = await Visit.findOne({
+    salesRep: visit.salesRep,
+    date: { $gte: dayStart, $lte: dayEnd },
+    timeSlot: { $lt: visit.timeSlot },
+    status: 'visited',
+    _id: { $ne: visit._id },
+  }).sort({ timeSlot: -1 }).populate('client', 'address name');
+
+  if (prevVisit && prevVisit.client && prevVisit.client.address) {
+    result.prevVisitAddress = prevVisit.client.address;
+    result.prevVisitClientName = prevVisit.client.name;
+  }
+
+  res.json(result);
 });
 
 // 更新拜訪紀錄
