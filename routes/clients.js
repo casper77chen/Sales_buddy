@@ -83,7 +83,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
 
 // 新增客戶頁
 router.get('/new', ensureAuthenticated, async (req, res) => {
-  const salesReps = await User.find({ role: 'sales', isApproved: true }).select('name').sort({ name: 1 });
+  const salesReps = await User.find({ role: { $in: ['sales', 'manager', 'admin'] }, isApproved: true }).select('name').sort({ name: 1 });
   res.render('clients/form', { client: null, salesReps });
 });
 
@@ -117,7 +117,7 @@ router.get('/:id/edit', ensureAuthenticated, async (req, res) => {
     req.flash('error_msg', '找不到此客戶');
     return res.redirect('/clients');
   }
-  const salesReps = await User.find({ role: 'sales', isApproved: true }).select('name').sort({ name: 1 });
+  const salesReps = await User.find({ role: { $in: ['sales', 'manager', 'admin'] }, isApproved: true }).select('name').sort({ name: 1 });
   res.render('clients/form', { client, salesReps });
 });
 
