@@ -186,7 +186,7 @@ body {
   padding: 2px !important;
   cursor: pointer;
   transition: background 0.15s;
-  overflow: visible;
+  position: relative;
 }
 
 .occupied-cell {

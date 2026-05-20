@@ -74,13 +74,13 @@
                 <% const dur = v.duration || 1; %>
                 <% if (v.source === 'google') { %>
                   <div class="visit-card visit-google" title="<%= v.content || '' %>"
-                    style="<%= dur > 1 ? 'height:' + (dur * 61 - 5) + 'px; position:relative; z-index:2;' : '' %>">
+                    style="<%= dur > 1 ? 'height:' + (dur * 61 - 5) + 'px; position:absolute; z-index:5; left:2px; right:2px; top:2px;' : '' %>">
                     <div class="visit-card-name"><i class="bi bi-google"></i> <%= v.content ? v.content.split('\n')[0] : 'Google 事件' %></div>
                   </div>
                 <% } else { %>
                   <div class="visit-card <%= v.client ? 'visit-' + v.status : 'visit-nonvisit' %>"
                     onclick="event.stopPropagation(); openEditModal('<%= v._id %>')"
-                    style="<%= dur > 1 ? 'height:' + (dur * 61 - 5) + 'px; position:relative; z-index:2;' : '' %>">
+                    style="<%= dur > 1 ? 'height:' + (dur * 61 - 5) + 'px; position:absolute; z-index:5; left:2px; right:2px; top:2px;' : '' %>">
                     <div class="visit-card-name"><%= v.client ? v.client.name : (v.content ? v.content.split('\n')[0] : '工作事項') %></div>
                     <span class="badge badge-<%= v.status %>">
                       <%= v.status === 'scheduled' ? '預排' : v.status === 'visited' ? '已訪' : '取消' %>
