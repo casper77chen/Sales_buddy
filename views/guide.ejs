@@ -1,0 +1,240 @@
+<div class="container py-4">
+  <h2 class="mb-4"><i class="bi bi-book"></i> 使用說明</h2>
+
+  <div class="accordion" id="guideAccordion">
+
+    <!-- 角色與權限 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#roleSection">
+          <i class="bi bi-people me-2"></i> 角色與權限
+        </button>
+      </h2>
+      <div id="roleSection" class="accordion-collapse collapse show" data-bs-parent="#guideAccordion">
+        <div class="accordion-body">
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>角色</th>
+                <th>功能權限</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge bg-dark">Admin</span></td>
+                <td>所有功能 + 使用者管理（審核帳號、指派角色與主管）</td>
+              </tr>
+              <tr>
+                <td><span class="badge bg-primary">總經理</span></td>
+                <td>審查<strong>主管</strong>的油資申報、查看所有業務行事曆與績效</td>
+              </tr>
+              <tr>
+                <td><span class="badge bg-success">主管</span></td>
+                <td>審查<strong>所屬業務</strong>的油資申報、查看所屬業務行事曆與績效</td>
+              </tr>
+              <tr>
+                <td><span class="badge bg-secondary">業務</span></td>
+                <td>管理自己的行事曆、拜訪紀錄、客戶資料、油資申報</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 週行事曆 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#calendarSection">
+          <i class="bi bi-calendar-week me-2"></i> 週行事曆
+        </button>
+      </h2>
+      <div id="calendarSection" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+        <div class="accordion-body">
+          <h6>新增拜訪行程</h6>
+          <ol>
+            <li>點擊行事曆上的空白時段格子</li>
+            <li>在搜尋框輸入客戶名稱（自動帶出建議）</li>
+            <li>選擇客戶後可填寫拜訪內容</li>
+            <li>按「新增」完成排程</li>
+          </ol>
+          <h6>編輯拜訪紀錄</h6>
+          <ol>
+            <li>點擊行事曆上的拜訪卡片</li>
+            <li>可修改：狀態、聯絡人、拜訪內容、後續追蹤</li>
+            <li>狀態選項：<span class="badge bg-info">預排</span> <span class="badge bg-success">已拜訪</span> <span class="badge bg-secondary">取消</span></li>
+          </ol>
+          <h6>切換檢視</h6>
+          <ul>
+            <li>上方可切換「週檢視」和「月檢視」</li>
+            <li>使用左右箭頭切換週次/月份</li>
+            <li>主管/總經理/Admin 可透過下拉選單查看其他業務的行事曆</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Google Calendar -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gcalSection">
+          <i class="bi bi-google me-2"></i> Google 日曆同步
+        </button>
+      </h2>
+      <div id="gcalSection" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+        <div class="accordion-body">
+          <ol>
+            <li>進入右上角選單 →「個人設定」</li>
+            <li>開啟 Google 日曆設定 → 選擇要同步的日曆</li>
+            <li>找到「以 iCal 格式顯示的私人網址」</li>
+            <li>複製網址貼到設定欄位，按「儲存」</li>
+          </ol>
+          <p class="text-muted mb-0">系統每 30 分鐘自動同步，同步的行程會以<span class="text-primary fw-bold">紫色</span>顯示在行事曆上。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 客戶管理 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#clientSection">
+          <i class="bi bi-building me-2"></i> 客戶管理
+        </button>
+      </h2>
+      <div id="clientSection" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+        <div class="accordion-body">
+          <h6>新增客戶</h6>
+          <p>點擊「新增客戶」按鈕，填寫診所名稱（必填）及其他資訊。</p>
+          <h6>客戶欄位說明</h6>
+          <table class="table table-sm">
+            <tbody>
+              <tr><td class="fw-bold" style="width:120px;">數位</td><td>是否為數位客戶（青色燈號）</td></tr>
+              <tr><td class="fw-bold">d+</td><td>d+ 合約客戶，可設定合約日期與狀態（綠色＝有效、橘色＝展延、紅色＝過期）</td></tr>
+              <tr><td class="fw-bold">HIS</td><td>是否使用 HIS 系統（紫色燈號）</td></tr>
+              <tr><td class="fw-bold">股東</td><td>是否為股東（金色燈號）</td></tr>
+            </tbody>
+          </table>
+          <h6>篩選功能</h6>
+          <ul>
+            <li>搜尋框：可搜尋診所名稱、聯絡人、地址、機構代碼</li>
+            <li>縣市/行政區：依地區篩選</li>
+            <li>負責業務：依指派業務篩選</li>
+          </ul>
+          <h6>CSV 匯入</h6>
+          <p>支援批次匯入客戶資料，欄位可用中文或英文名稱。</p>
+          <h6>拜訪紀錄</h6>
+          <p>點擊客戶名稱可查看該客戶的所有拜訪歷史。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 油資申報 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mileageSection">
+          <i class="bi bi-fuel-pump me-2"></i> 油資申報
+        </button>
+      </h2>
+      <div id="mileageSection" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+        <div class="accordion-body">
+          <h6>申報流程（業務）</h6>
+          <ol>
+            <li>在行事曆將拜訪狀態改為「已拜訪」</li>
+            <li>系統自動跳出油資申報視窗，顯示：
+              <ul>
+                <li><strong>出發地</strong>：預設公司地址，若當天有上一個行程則自動帶入前一個拜訪地址</li>
+                <li><strong>拜訪地</strong>：自動帶入該客戶地址</li>
+                <li>兩個欄位皆可手動修改</li>
+              </ul>
+            </li>
+            <li>按「申報油資」→ 系統透過 Google Maps 計算行車距離</li>
+            <li>確認資訊後送出，等待主管審核</li>
+          </ol>
+          <h6>審查流程（主管/總經理/Admin）</h6>
+          <ul>
+            <li>進入「油資申報/審查」頁面</li>
+            <li>待審油資依申報人分組顯示，點擊可展開明細</li>
+            <li><strong>批次核准</strong>：點「全部核准」一次通過該人所有申報</li>
+            <li><strong>個別操作</strong>：可逐筆核准 <i class="bi bi-check-lg text-success"></i> 或駁回 <i class="bi bi-x-lg text-danger"></i>（可填寫駁回原因）</li>
+            <li>核准後系統自動寄送通知信給財務</li>
+          </ul>
+          <h6>審查權限</h6>
+          <table class="table table-sm">
+            <tbody>
+              <tr><td class="fw-bold" style="width:100px;">主管</td><td>審查所屬業務的油資</td></tr>
+              <tr><td class="fw-bold">總經理</td><td>審查主管的油資</td></tr>
+              <tr><td class="fw-bold">Admin</td><td>審查所有人的油資</td></tr>
+            </tbody>
+          </table>
+          <h6>申報狀態</h6>
+          <p>
+            <span class="badge bg-warning text-dark">待審核</span> 等待主管審核 &nbsp;
+            <span class="badge bg-success">已核准</span> 審核通過 &nbsp;
+            <span class="badge bg-danger">已駁回</span> 審核未通過（可查看駁回原因）
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主管面板 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#managerSection">
+          <i class="bi bi-speedometer2 me-2"></i> 主管面板
+        </button>
+      </h2>
+      <div id="managerSection" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+        <div class="accordion-body">
+          <p>主管/總經理/Admin 可查看本週團隊績效：</p>
+          <ul>
+            <li><strong>本週總行程</strong>：所有業務排定的拜訪數</li>
+            <li><strong>已完成拜訪</strong>：標記為「已拜訪」的數量</li>
+            <li><strong>本週新增客戶</strong>：本週新建立的客戶數</li>
+          </ul>
+          <h6>各業務本週表現</h6>
+          <p>表格顯示每位業務的排定行程、已完成拜訪、完成率、油資申報數、新增客戶數，可直接點擊查看該業務的行事曆。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 管理面板 (Admin) -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#adminSection">
+          <i class="bi bi-gear me-2"></i> 管理面板（Admin 專用）
+        </button>
+      </h2>
+      <div id="adminSection" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+        <div class="accordion-body">
+          <h6>帳號審核</h6>
+          <p>新註冊的使用者需要 Admin 核准後才能登入。待審核帳號會顯示在頁面上方。</p>
+          <h6>使用者管理</h6>
+          <ul>
+            <li><strong>角色變更</strong>：透過下拉選單直接切換（業務/主管/總經理/Admin）</li>
+            <li><strong>指派主管</strong>：為業務或主管指定所屬主管</li>
+            <li><strong>刪除帳號</strong>：移除使用者（無法刪除自己）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 帳號設定 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accountSection">
+          <i class="bi bi-person-gear me-2"></i> 帳號相關
+        </button>
+      </h2>
+      <div id="accountSection" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+        <div class="accordion-body">
+          <ul>
+            <li><strong>修改密碼</strong>：右上角選單 →「修改密碼」，需輸入舊密碼驗證</li>
+            <li><strong>忘記密碼</strong>：登入頁面點「忘記密碼」，系統會寄送重設連結到 Email（1 小時內有效）</li>
+            <li><strong>個人設定</strong>：右上角選單 →「個人設定」，可設定 Google 日曆同步</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

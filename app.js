@@ -64,6 +64,11 @@ app.use('/admin', require('./routes/admin'));
 app.use('/api', require('./routes/api'));
 app.use('/settings', require('./routes/settings'));
 
+// 使用說明頁
+app.get('/guide', (req, res) => {
+  res.render('guide');
+});
+
 // 啟動 Google Calendar 定時同步
 const { startCalendarSync } = require('./config/calendar-sync');
 startCalendarSync();
