@@ -11,7 +11,7 @@ const { ensureAuthenticated } = require('../middleware/auth');
 router.get('/', ensureAuthenticated, async (req, res) => {
   // 自己的油資申報
   const claims = await MileageClaim.find({ salesRep: req.user._id })
-    .populate({ path: 'visit', populate: { path: 'client', select: 'name' } })
+    .populate({ path: 'visit', select: 'date client', populate: { path: 'client', select: 'name' } })
     .sort({ createdAt: -1 });
 
   // 待審油資（依角色）
