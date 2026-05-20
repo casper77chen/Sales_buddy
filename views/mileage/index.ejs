@@ -25,6 +25,7 @@
           <div>
             <strong><%= grouped[repId].name %></strong>
             <span class="badge bg-secondary ms-2"><%= grouped[repId].claims.length %> 筆</span>
+            <span class="badge bg-success ms-1">$<%= grouped[repId].claims.reduce((sum, c) => sum + (c.cost || Math.round(c.distanceKm * 6)), 0) %></span>
           </div>
           <div class="d-flex align-items-center gap-2">
             <button type="submit" class="btn btn-sm btn-success" onclick="event.stopPropagation(); selectGroup(<%= idx %>);">
@@ -43,6 +44,7 @@
                   <th>出發地</th>
                   <th>目的地</th>
                   <th>距離</th>
+                  <th>費用</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -54,6 +56,7 @@
                     <td><small><%= claim.originAddress %></small></td>
                     <td><small><%= claim.destinationAddress %></small></td>
                     <td><%= claim.distanceText || claim.distanceKm + ' km' %></td>
+                    <td>$<%= claim.cost || Math.round(claim.distanceKm * 6) %></td>
                     <td>
                       <input type="checkbox" name="claimIds" value="<%= claim._id %>" class="group-<%= idx %> d-none">
                       <form action="/mileage/<%= claim._id %>?_method=PUT" method="POST" class="d-inline">
@@ -103,6 +106,7 @@
           <th>出發地</th>
           <th>目的地</th>
           <th>距離</th>
+          <th>費用</th>
           <th>狀態</th>
           <th>審核備註</th>
         </tr>
@@ -115,6 +119,7 @@
             <td><%= claim.originAddress %></td>
             <td><%= claim.destinationAddress %></td>
             <td><%= claim.distanceText || claim.distanceKm + ' km' %></td>
+            <td>$<%= claim.cost || Math.round(claim.distanceKm * 6) %></td>
             <td>
               <% if (claim.status === 'pending') { %>
                 <span class="badge bg-warning text-dark">待審核</span>

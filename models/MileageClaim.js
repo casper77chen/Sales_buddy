@@ -8,6 +8,7 @@ const MileageClaimSchema = new mongoose.Schema({
   distanceKm: { type: Number, required: true },
   distanceText: { type: String },
   durationText: { type: String },
+  cost: { type: Number, default: 0 },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   reviewedAt: { type: Date },

@@ -29,16 +29,22 @@
         </div>
 
         <div class="row text-center mb-4">
-          <div class="col-6">
+          <div class="col-4">
             <div class="stat-card card">
               <div class="stat-number"><%= distance.distanceText %></div>
               <div class="stat-label">距離</div>
             </div>
           </div>
-          <div class="col-6">
+          <div class="col-4">
             <div class="stat-card card">
               <div class="stat-number"><%= distance.durationText %></div>
               <div class="stat-label">預估車程</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-card card">
+              <div class="stat-number text-success">$<%= Math.round(distance.distanceKm * 6) %></div>
+              <div class="stat-label">油資費用（$6/km）</div>
             </div>
           </div>
         </div>

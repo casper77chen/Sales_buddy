@@ -96,14 +96,18 @@ router.post('/', ensureAuthenticated, async (req, res) => {
     return res.redirect('/mileage');
   }
 
+  const km = parseFloat(distanceKm) || 0;
+  const RATE_PER_KM = 6;
+
   await MileageClaim.create({
     visit: visitId,
     salesRep: req.user._id,
     originAddress,
     destinationAddress,
-    distanceKm: parseFloat(distanceKm) || 0,
+    distanceKm: km,
     distanceText,
     durationText,
+    cost: Math.round(km * RATE_PER_KM),
     status: 'pending',
   });
 
