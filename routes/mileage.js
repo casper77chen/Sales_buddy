@@ -58,15 +58,37 @@ router.get('/confirm', ensureAuthenticated, async (req, res) => {
     return res.redirect('/');
   }
 
-  // 已有申報則不允許重複
+  // 已有申報則不允許重複（同拜訪 or 同日期同地點）
   const existing = await MileageClaim.findOne({ visit: visitId });
   if (existing) {
     req.flash('error_msg', '此拜訪已申報過油資');
-    return res.redirect('/mileage');
+    return res.redirect('/');
   }
-
   const origin = req.query.origin || process.env.COMPANY_ADDRESS || '台北市';
   const destination = req.query.destination || (visit.client ? visit.client.address : '');
+
+  // 防重複（同日期同地點）
+  if (destination) {
+    const dayStart = new Date(visit.date);
+    dayStart.setUTCHours(0, 0, 0, 0);
+    const dayEnd = new Date(visit.date);
+    dayEnd.setUTCHours(23, 59, 59, 999);
+    const sameDayVisits = await Visit.find({
+      salesRep: req.user._id,
+      date: { $gte: dayStart, $lte: dayEnd },
+      _id: { $ne: visitId },
+    }).select('_id');
+    if (sameDayVisits.length > 0) {
+      const dupClaim = await MileageClaim.findOne({
+        visit: { $in: sameDayVisits.map(v => v._id) },
+        destinationAddress: destination,
+      });
+      if (dupClaim) {
+        req.flash('error_msg', '同日期同地點已申報過油資');
+        return res.redirect('/');
+      }
+    }
+  }
 
   let distance = { distanceKm: 0, distanceText: '-', durationText: '-' };
   if (destination) {
@@ -89,11 +111,36 @@ router.get('/confirm', ensureAuthenticated, async (req, res) => {
 router.post('/', ensureAuthenticated, async (req, res) => {
   const { visitId, originAddress, destinationAddress, distanceKm, distanceText, durationText } = req.body;
 
-  // 防重複
+  // 防重複（同拜訪）
   const existing = await MileageClaim.findOne({ visit: visitId });
   if (existing) {
     req.flash('error_msg', '此拜訪已申報過油資');
-    return res.redirect('/mileage');
+    return res.redirect('/');
+  }
+  // 防重複（同日期同地點）
+  if (destinationAddress) {
+    const visit = await Visit.findById(visitId).select('date salesRep');
+    if (visit) {
+      const dayStart = new Date(visit.date);
+      dayStart.setUTCHours(0, 0, 0, 0);
+      const dayEnd = new Date(visit.date);
+      dayEnd.setUTCHours(23, 59, 59, 999);
+      const sameDayVisits = await Visit.find({
+        salesRep: req.user._id,
+        date: { $gte: dayStart, $lte: dayEnd },
+        _id: { $ne: visitId },
+      }).select('_id');
+      if (sameDayVisits.length > 0) {
+        const dupClaim = await MileageClaim.findOne({
+          visit: { $in: sameDayVisits.map(v => v._id) },
+          destinationAddress,
+        });
+        if (dupClaim) {
+          req.flash('error_msg', '同日期同地點已申報過油資');
+          return res.redirect('/');
+        }
+      }
+    }
   }
 
   const km = parseFloat(distanceKm) || 0;
