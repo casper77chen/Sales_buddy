@@ -39,7 +39,8 @@
             <table class="table table-hover mb-0">
               <thead>
                 <tr>
-                  <th>日期</th>
+                  <th>拜訪日期</th>
+                  <th>送審日期</th>
                   <th>客戶</th>
                   <th>出發地</th>
                   <th>目的地</th>
@@ -51,6 +52,7 @@
               <tbody>
                 <% grouped[repId].claims.forEach(claim => { %>
                   <tr>
+                    <td><%= claim.visit && claim.visit.date ? claim.visit.date.toISOString().split('T')[0] : '-' %></td>
                     <td><%= claim.createdAt.toISOString().split('T')[0] %></td>
                     <td><%= claim.visit && claim.visit.client ? claim.visit.client.name : '-' %></td>
                     <td><small><%= claim.originAddress %></small></td>
