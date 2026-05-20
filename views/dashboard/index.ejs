@@ -239,14 +239,22 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-fuel-pump"></i> 是否申報油資？</h5>
+        <h5 class="modal-title"><i class="bi bi-fuel-pump"></i> 申報油資</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p>拜訪紀錄已儲存。是否要申報此次拜訪的交通油資？</p>
+        <p class="text-muted mb-3">拜訪紀錄已儲存，是否申報此次交通油資？</p>
+        <div class="mb-3">
+          <label class="form-label fw-bold"><i class="bi bi-geo-alt text-primary"></i> 出發地</label>
+          <p id="mileageOrigin" class="border rounded p-2 bg-light mb-0">-</p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold"><i class="bi bi-geo-alt-fill text-danger"></i> 拜訪地</label>
+          <p id="mileageDestination" class="border rounded p-2 bg-light mb-0">-</p>
+        </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">稍後再說</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">不申報油資</button>
         <a id="mileageLink" href="#" class="btn btn-primary"><i class="bi bi-fuel-pump"></i> 申報油資</a>
       </div>
     </div>
@@ -259,6 +267,17 @@
   const showMileageId = urlParams.get('showMileage');
   if (showMileageId) {
     document.getElementById('mileageLink').href = '/mileage/confirm?visitId=' + showMileageId;
-    new bootstrap.Modal(document.getElementById('mileagePromptModal')).show();
+    // 取得拜訪詳情填入 modal
+    fetch('/visits/' + showMileageId + '/json')
+      .then(r => r.json())
+      .then(visit => {
+        document.getElementById('mileageOrigin').textContent = '<%= process.env.COMPANY_ADDRESS || "台北市羅斯福路三段136號" %>';
+        document.getElementById('mileageDestination').textContent = visit.client && visit.client.address ? visit.client.address : '(未填寫地址)';
+        new bootstrap.Modal(document.getElementById('mileagePromptModal')).show();
+      })
+      .catch(() => {
+        document.getElementById('mileageOrigin').textContent = '<%= process.env.COMPANY_ADDRESS || "台北市羅斯福路三段136號" %>';
+        new bootstrap.Modal(document.getElementById('mileagePromptModal')).show();
+      });
   }
 </script>
