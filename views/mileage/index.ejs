@@ -92,7 +92,22 @@
   <div class="alert alert-info mb-4"><i class="bi bi-info-circle"></i> 目前沒有待審油資</div>
 <% } %>
 
-<h4><i class="bi bi-list-check"></i> 我的油資申報</h4>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0"><i class="bi bi-list-check"></i> 我的油資申報</h4>
+  <div class="d-flex align-items-center gap-2">
+    <form class="d-flex align-items-center gap-2" method="GET" action="/mileage" id="filterForm">
+      <label for="month" class="form-label mb-0 text-nowrap">拜訪月份</label>
+      <input type="month" id="month" name="month" class="form-control form-control-sm" style="width: 170px;"
+        value="<%= month %>" onchange="document.getElementById('filterForm').submit();">
+      <% if (month) { %>
+        <a href="/mileage" class="btn btn-sm btn-outline-secondary text-nowrap">清除</a>
+      <% } %>
+    </form>
+    <a href="/mileage/export<%= month ? '?month=' + month : '' %>" class="btn btn-sm btn-outline-success text-nowrap">
+      <i class="bi bi-download"></i> 匯出 CSV
+    </a>
+  </div>
+</div>
 <% if (claims.length === 0) { %>
   <div class="text-center text-muted mt-4">
     <i class="bi bi-fuel-pump" style="font-size: 3rem;"></i>

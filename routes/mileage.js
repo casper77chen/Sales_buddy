@@ -9,8 +9,23 @@ const { ensureAuthenticated } = require('../middleware/auth');
 
 // 油資申報 + 審查頁面
 router.get('/', ensureAuthenticated, async (req, res) => {
+  // 月份篩選
+  const month = req.query.month; // YYYY-MM
+  let claimQuery = { salesRep: req.user._id };
+  if (month) {
+    const [y, m] = month.split('-').map(Number);
+    const start = new Date(Date.UTC(y, m - 1, 1));
+    const end = new Date(Date.UTC(y, m, 1));
+    // 找出該月份的拜訪 ID
+    const monthVisits = await Visit.find({
+      salesRep: req.user._id,
+      date: { $gte: start, $lt: end },
+    }).select('_id');
+    claimQuery.visit = { $in: monthVisits.map(v => v._id) };
+  }
+
   // 自己的油資申報
-  const claims = await MileageClaim.find({ salesRep: req.user._id })
+  const claims = await MileageClaim.find(claimQuery)
     .populate({ path: 'visit', select: 'date client', populate: { path: 'client', select: 'name' } })
     .sort({ createdAt: -1 });
 
@@ -41,7 +56,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   }
 
   const canReview = ['admin', 'gm', 'manager'].includes(role);
-  res.render('mileage/index', { claims, pendingClaims, canReview });
+  res.render('mileage/index', { claims, pendingClaims, canReview, month: month || '' });
 });
 
 // 油資確認頁（計算距離）
@@ -255,6 +270,49 @@ router.post('/batch-approve', ensureAuthenticated, async (req, res) => {
 
   req.flash('success_msg', `已核准 ${claims.length} 筆油資申報`);
   res.redirect('/mileage');
+});
+
+// 匯出油資 CSV
+router.get('/export', ensureAuthenticated, async (req, res) => {
+  const month = req.query.month;
+  let claimQuery = { salesRep: req.user._id };
+  if (month) {
+    const [y, m] = month.split('-').map(Number);
+    const start = new Date(Date.UTC(y, m - 1, 1));
+    const end = new Date(Date.UTC(y, m, 1));
+    const monthVisits = await Visit.find({
+      salesRep: req.user._id,
+      date: { $gte: start, $lt: end },
+    }).select('_id');
+    claimQuery.visit = { $in: monthVisits.map(v => v._id) };
+  }
+
+  const claims = await MileageClaim.find(claimQuery)
+    .populate({ path: 'visit', select: 'date client', populate: { path: 'client', select: 'name' } })
+    .sort({ createdAt: -1 });
+
+  const BOM = '\uFEFF';
+  const header = '拜訪日期,送審日期,客戶,出發地,目的地,距離,費用,狀態,審核備註';
+  const statusMap = { pending: '待審核', approved: '已核准', rejected: '已駁回' };
+  const rows = claims.map(c => {
+    const visitDate = c.visit && c.visit.date ? c.visit.date.toISOString().split('T')[0] : '-';
+    const submitDate = c.createdAt.toISOString().split('T')[0];
+    const client = c.visit && c.visit.client ? c.visit.client.name : '-';
+    const esc = (s) => `"${(s || '').replace(/"/g, '""')}"`;
+    return [
+      visitDate, submitDate, esc(client),
+      esc(c.originAddress), esc(c.destinationAddress),
+      c.distanceText || c.distanceKm + ' km',
+      c.cost || Math.round(c.distanceKm * 6),
+      statusMap[c.status] || c.status,
+      esc(c.reviewNote || ''),
+    ].join(',');
+  });
+
+  const filename = month ? `油資申報_${month}.csv` : '油資申報_全部.csv';
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+  res.send(BOM + header + '\n' + rows.join('\n'));
 });
 
 module.exports = router;
