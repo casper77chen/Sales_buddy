@@ -51,6 +51,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   const cityFilter = req.query.city || '';
   const districtFilter = req.query.district || '';
   const repFilter = req.query.rep || '';
+  const statusFilters = [].concat(req.query.status || []);
 
   const query = {};
   if (search) {
@@ -70,6 +71,15 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   } else if (repFilter) {
     query.assignedTo = repFilter;
   }
+  // 狀態篩選（複選）
+  if (statusFilters.length > 0) {
+    statusFilters.forEach(f => {
+      if (f === 'digital') query.isDigital = true;
+      if (f === 'dplus') query.hasDPlus = true;
+      if (f === 'his') query.hasHIS = true;
+      if (f === 'shareholder') query.isShareholder = true;
+    });
+  }
 
   const clients = await Client.find(query).sort({ city: 1, district: 1, name: 1 }).populate('createdBy', 'name').populate('assignedTo', 'name');
 
@@ -78,7 +88,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
   const districts = cityFilter ? await Client.distinct('district', { city: cityFilter }) : [];
   const salesReps = await User.find({ role: { $in: ['sales', 'manager', 'gm'] }, isApproved: true }).select('name').sort({ name: 1 });
 
-  res.render('clients/index', { clients, search, cityFilter, districtFilter, repFilter, cities, districts, salesReps });
+  res.render('clients/index', { clients, search, cityFilter, districtFilter, repFilter, statusFilters, cities, districts, salesReps });
 });
 
 // 新增客戶頁

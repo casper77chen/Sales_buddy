@@ -39,9 +39,24 @@
         </select>
       </div>
     <% } %>
+    <div class="col-md-auto d-flex align-items-center gap-2 flex-wrap">
+      <% const statusOpts = [
+        { value: 'digital', label: '數位' },
+        { value: 'dplus', label: 'd+' },
+        { value: 'his', label: 'HIS' },
+        { value: 'shareholder', label: '股東' },
+      ]; %>
+      <% statusOpts.forEach(opt => { %>
+        <div class="form-check form-check-inline mb-0">
+          <input type="checkbox" name="status" value="<%= opt.value %>" id="st-<%= opt.value %>"
+            class="form-check-input" <%= statusFilters.includes(opt.value) ? 'checked' : '' %> onchange="this.form.submit();">
+          <label for="st-<%= opt.value %>" class="form-check-label"><%= opt.label %></label>
+        </div>
+      <% }) %>
+    </div>
     <div class="col-md-2">
       <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i> 搜尋</button>
-      <% if (search || cityFilter || districtFilter || repFilter) { %>
+      <% if (search || cityFilter || districtFilter || repFilter || statusFilters.length > 0) { %>
         <a href="/clients" class="btn btn-outline-secondary">清除</a>
       <% } %>
     </div>
