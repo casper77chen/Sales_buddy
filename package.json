@@ -27,6 +27,7 @@
     "node-cron": "^4.2.1",
     "node-ical": "^0.26.1",
     "passport": "^0.7.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "xlsx": "^0.18.5"
   }
 }

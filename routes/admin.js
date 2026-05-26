@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
 const User = require('../models/User');
+const Client = require('../models/Client');
 const { ensureAuthenticated, ensureAdmin } = require('../middleware/auth');
 
 // 使用者管理
@@ -42,5 +44,97 @@ router.delete('/users/:id', ensureAuthenticated, ensureAdmin, async (req, res) =
   req.flash('success_msg', '使用者已刪除');
   res.redirect('/admin');
 });
+
+// ============ d+ 客戶匯入 ============
+
+// 預覽 (dry run)
+router.get('/import-dplus', ensureAuthenticated, ensureAdmin, async (req, res) => {
+  try {
+    const importData = require('../scripts/dplus-import-data.json');
+    const result = await runDPlusImport(importData, true);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 執行匯入
+router.post('/import-dplus', ensureAuthenticated, ensureAdmin, async (req, res) => {
+  try {
+    const importData = require('../scripts/dplus-import-data.json');
+    const result = await runDPlusImport(importData, false);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+async function runDPlusImport(importData, dryRun) {
+  const allClients = await Client.find({}).lean();
+
+  const stats = { total: importData.length, matched: 0, alreadyDPlus: 0, updated: 0, created: 0, fuzzyMatched: 0 };
+  const details = { updated: [], created: [], alreadyDPlus: [], fuzzyMatched: [] };
+
+  for (const clinic of importData) {
+    // Exact match
+    let match = allClients.find(c => c.name === clinic.name);
+    let method = 'exact';
+
+    // Fuzzy match
+    if (!match) {
+      const cleanName = clinic.name.replace(/牙醫診所|牙醫|診所/g, '');
+      if (cleanName.length >= 2) {
+        match = allClients.find(c => {
+          const dbClean = c.name.replace(/牙醫診所|牙醫|診所/g, '');
+          return dbClean.length >= 2 && (dbClean === cleanName || c.name.includes(cleanName) || clinic.name.includes(dbClean));
+        });
+        if (match) method = 'fuzzy';
+      }
+    }
+
+    if (match) {
+      stats.matched++;
+      if (method === 'fuzzy') {
+        stats.fuzzyMatched++;
+        details.fuzzyMatched.push({ excel: clinic.name, db: match.name, raw: clinic.raw });
+      }
+
+      const contractDate = clinic.activationDate ? new Date(clinic.activationDate) : undefined;
+
+      if (match.hasDPlus) {
+        stats.alreadyDPlus++;
+        details.alreadyDPlus.push(match.name);
+        // 即使已是 d+，也補上合約日期（如果原本沒有的話）
+        if (!dryRun && contractDate && !match.dPlusContractDate) {
+          await Client.findByIdAndUpdate(match._id, { dPlusContractDate: contractDate });
+        }
+      } else {
+        stats.updated++;
+        details.updated.push({ name: match.name, id: match._id, method });
+        if (!dryRun) {
+          const update = { hasDPlus: true };
+          if (contractDate) update.dPlusContractDate = contractDate;
+          await Client.findByIdAndUpdate(match._id, update);
+        }
+      }
+    } else {
+      stats.created++;
+      const contractDate = clinic.activationDate ? new Date(clinic.activationDate) : undefined;
+      const newClient = {
+        name: clinic.name,
+        hasDPlus: true,
+        city: clinic.city || undefined,
+        district: clinic.district || undefined,
+        dPlusContractDate: contractDate,
+      };
+      details.created.push(newClient);
+      if (!dryRun) {
+        await Client.create(newClient);
+      }
+    }
+  }
+
+  return { dryRun, stats, details };
+}
 
 module.exports = router;
