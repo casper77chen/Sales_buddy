@@ -61,6 +61,11 @@
                 value="<%= client ? client.institutionCode || '' : '' %>">
             </div>
           </div>
+          <div class="mb-3">
+            <label for="managementCompany" class="form-label">管理公司</label>
+            <input type="text" name="managementCompany" id="managementCompany" class="form-control" placeholder="例：○○股份有限公司"
+              value="<%= client ? client.managementCompany || '' : '' %>">
+          </div>
           <div class="row">
             <div class="col-md-4 mb-3">
               <label for="city" class="form-label">縣市</label>

@@ -163,6 +163,7 @@
     "name": "絕美時尚牙醫診所",
     "city": "花蓮縣",
     "district": "花蓮",
+    "managementCompany": "晞亞有限公司",
     "erpCode": "000000011317",
     "activationDate": "2025/02/14 12:31:14",
     "raw": "晞亞有限公司（花蓮_絕美時尚牙醫診所）"
@@ -329,7 +330,7 @@
   },
   {
     "name": "文山牙醫診所",
-    "city": "",
+    "city": "台北市",
     "district": "",
     "erpCode": "000000012147",
     "activationDate": "2025/03/14 17:29:58",
@@ -353,7 +354,7 @@
   },
   {
     "name": "貝瑞牙醫診所",
-    "city": "",
+    "city": "新北市",
     "district": "",
     "erpCode": "000000012607",
     "activationDate": "2025/01/03 14:47:25",
@@ -737,8 +738,9 @@
   },
   {
     "name": "初九牙醫診所",
-    "city": "",
+    "city": "彰化縣",
     "district": "",
+    "managementCompany": "初九有限公司",
     "erpCode": "000000014247",
     "activationDate": "2025/03/07 12:26:11",
     "raw": "初九有限公司"
@@ -819,6 +821,7 @@
     "name": "新隆豐牙醫診所",
     "city": "桃園市",
     "district": "桃園",
+    "managementCompany": "鑫聚成有限公司",
     "erpCode": "000000014658",
     "activationDate": "2025/08/05 13:45:11",
     "raw": "鑫聚成有限公司(桃園_新隆豐牙醫診所)"
@@ -993,7 +996,7 @@
   },
   {
     "name": "寓光牙醫診所",
-    "city": "",
+    "city": "新竹",
     "district": "",
     "erpCode": "000000015085",
     "activationDate": "2025/01/02 15:09:45",
@@ -1219,6 +1222,7 @@
     "name": "悅庭牙醫診所",
     "city": "台北市",
     "district": "士林",
+    "managementCompany": "朗耀股份有限公司",
     "erpCode": "000000016179",
     "activationDate": "2025/03/20 10:57:03",
     "raw": "朗耀股份有限公司 （士林_悅庭牙醫診所）"
@@ -1825,8 +1829,9 @@
   },
   {
     "name": "愛鑫牙醫診所",
-    "city": "",
+    "city": "台中市",
     "district": "",
+    "managementCompany": "精明國際股份有限公司",
     "erpCode": "000000019311",
     "activationDate": "2025/02/10 16:02:11",
     "raw": "精明國際股份有限公司(愛鑫)"
@@ -2241,8 +2246,9 @@
   },
   {
     "name": "潔宇牙醫診所",
-    "city": "",
+    "city": "台中市",
     "district": "",
+    "managementCompany": "劉利國際科技股份有限公司",
     "erpCode": "000000023147",
     "activationDate": "2025/05/02 10:04:27",
     "raw": "劉利國際科技股份有限公司（潔宇）"
@@ -2251,6 +2257,7 @@
     "name": "金山蒔美牙醫診所",
     "city": "台北市",
     "district": "中正",
+    "managementCompany": "學佑有限股份公司",
     "erpCode": "000000023191",
     "activationDate": "2025/03/31 10:05:25",
     "raw": "學佑有限股份公司（中正_金山蒔美牙醫診所）"
@@ -2267,6 +2274,7 @@
     "name": "品馥牙醫診所",
     "city": "新竹",
     "district": "竹北",
+    "managementCompany": "三口管理顧問股份有限公司",
     "erpCode": "000000023443",
     "activationDate": "2025/02/25 15:37:39",
     "raw": "三口管理顧問股份有限公司（竹北_品馥牙醫診所）"
@@ -2281,8 +2289,9 @@
   },
   {
     "name": "勇創者牙醫診所",
-    "city": "",
+    "city": "桃園市",
     "district": "",
+    "managementCompany": "勇創者企業股份有限公司",
     "erpCode": "000000023498",
     "activationDate": "2025/06/09 15:56:01",
     "raw": "勇創者企業股份有限公司"
@@ -2403,6 +2412,7 @@
     "name": "樂同牙醫診所",
     "city": "新北市",
     "district": "三峽",
+    "managementCompany": "博仁綜合醫院",
     "erpCode": "000000024750",
     "activationDate": "2025/05/19 14:56:42",
     "raw": "博仁綜合醫院（三峽_樂同牙醫診所）"
@@ -2473,8 +2483,9 @@
   },
   {
     "name": "醫安生醫",
-    "city": "",
+    "city": "台中市",
     "district": "",
+    "managementCompany": "醫安生醫",
     "erpCode": "000000025119",
     "activationDate": "2025/03/18 10:01:01",
     "raw": "醫安生醫"
@@ -2585,8 +2596,9 @@
   },
   {
     "name": "源遠牙醫聯盟",
-    "city": "",
+    "city": "台南市",
     "district": "",
+    "managementCompany": "麓源股份有限公司",
     "erpCode": "000000026119",
     "activationDate": "2025/03/14 13:53:04",
     "raw": "麓源股份有限公司(源遠牙醫聯盟)"
@@ -2833,8 +2845,9 @@
   },
   {
     "name": "高第牙醫診所",
-    "city": "",
+    "city": "台中市",
     "district": "",
+    "managementCompany": "毅華有限公司",
     "erpCode": "000000027240",
     "activationDate": "2025/05/21 18:15:05",
     "raw": "毅華有限公司(高第)"
@@ -2857,8 +2870,9 @@
   },
   {
     "name": "聯欣生技",
-    "city": "",
+    "city": "高雄市",
     "district": "",
+    "managementCompany": "聯欣生技有限公司",
     "erpCode": "000000027406",
     "activationDate": "2025/06/04 11:11:46",
     "raw": "聯欣生技有限公司"
@@ -2883,6 +2897,7 @@
     "name": "友齡牙醫",
     "city": "台中市",
     "district": "大甲",
+    "managementCompany": "蓼莪健康事業有限公司",
     "erpCode": "000000027450",
     "activationDate": "2025/06/12 09:26:39",
     "raw": "蓼莪健康事業有限公司(大甲_友齡牙醫)"
@@ -3017,8 +3032,9 @@
   },
   {
     "name": "璽宇牙醫診所",
-    "city": "",
+    "city": "台中市",
     "district": "",
+    "managementCompany": "璽宇股份有限公司",
     "erpCode": "000000027971",
     "activationDate": "2025/09/10 11:33:05",
     "raw": "璽宇股份有限公司"
@@ -3091,6 +3107,7 @@
     "name": "群盛牙醫診所",
     "city": "桃園市",
     "district": "桃園",
+    "managementCompany": "歐問投資有限公司",
     "erpCode": "000000028263",
     "activationDate": "2025/11/21 09:52:33",
     "raw": "歐問投資有限公司（桃園_群盛牙醫診所）"
@@ -3345,7 +3362,7 @@
   },
   {
     "name": "優登牙醫診所",
-    "city": "",
+    "city": "台北市",
     "district": "",
     "erpCode": "000000030615",
     "activationDate": "2026/02/11 17:38:13",

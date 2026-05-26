@@ -104,9 +104,12 @@ async function runDPlusImport(importData, dryRun) {
       if (match.hasDPlus) {
         stats.alreadyDPlus++;
         details.alreadyDPlus.push(match.name);
-        // 即使已是 d+，也補上合約日期（如果原本沒有的話）
-        if (!dryRun && contractDate && !match.dPlusContractDate) {
-          await Client.findByIdAndUpdate(match._id, { dPlusContractDate: contractDate });
+        // 即使已是 d+，也補上合約日期和管理公司（如果原本沒有的話）
+        if (!dryRun) {
+          const patch = {};
+          if (contractDate && !match.dPlusContractDate) patch.dPlusContractDate = contractDate;
+          if (clinic.managementCompany && !match.managementCompany) patch.managementCompany = clinic.managementCompany;
+          if (Object.keys(patch).length > 0) await Client.findByIdAndUpdate(match._id, patch);
         }
       } else {
         stats.updated++;
@@ -114,6 +117,7 @@ async function runDPlusImport(importData, dryRun) {
         if (!dryRun) {
           const update = { hasDPlus: true };
           if (contractDate) update.dPlusContractDate = contractDate;
+          if (clinic.managementCompany) update.managementCompany = clinic.managementCompany;
           await Client.findByIdAndUpdate(match._id, update);
         }
       }
@@ -126,6 +130,7 @@ async function runDPlusImport(importData, dryRun) {
         city: clinic.city || undefined,
         district: clinic.district || undefined,
         dPlusContractDate: contractDate,
+        managementCompany: clinic.managementCompany || undefined,
       };
       details.created.push(newClient);
       if (!dryRun) {

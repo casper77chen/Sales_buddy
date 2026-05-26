@@ -10,6 +10,7 @@ const ClientSchema = new mongoose.Schema({
   dPlusStatus: { type: String, enum: ['', 'extended', 'achieved'], default: '' },
   hasHIS: { type: Boolean, default: false },
   isShareholder: { type: Boolean, default: false },
+  managementCompany: { type: String },
   owner: { type: String },
   contactPerson: { type: String },
   notes: { type: String },

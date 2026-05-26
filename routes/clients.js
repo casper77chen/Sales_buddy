@@ -99,7 +99,7 @@ router.get('/new', ensureAuthenticated, async (req, res) => {
 
 // 新增客戶處理
 router.post('/', ensureAuthenticated, async (req, res) => {
-  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook, isDigital, hasDPlus, hasHIS, isShareholder, assignedTo, dPlusContractDate, dPlusStatus } = req.body;
+  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook, isDigital, hasDPlus, hasHIS, isShareholder, assignedTo, dPlusContractDate, dPlusStatus, managementCompany } = req.body;
 
   if (!name) {
     req.flash('error_msg', '請填寫診所名稱');
@@ -108,7 +108,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 
   await Client.create({
     name, phone, address, owner, contactPerson, notes,
-    institutionCode, city, district, website, facebook,
+    institutionCode, city, district, website, facebook, managementCompany,
     isDigital: isDigital === 'on', hasDPlus: hasDPlus === 'on', hasHIS: hasHIS === 'on', isShareholder: isShareholder === 'on',
     dPlusContractDate: dPlusContractDate || null,
     dPlusStatus: dPlusStatus || '',
@@ -133,10 +133,10 @@ router.get('/:id/edit', ensureAuthenticated, async (req, res) => {
 
 // 更新客戶
 router.put('/:id', ensureAuthenticated, async (req, res) => {
-  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook, isDigital, hasDPlus, hasHIS, isShareholder, assignedTo, dPlusContractDate, dPlusStatus } = req.body;
+  const { name, phone, address, owner, contactPerson, notes, institutionCode, city, district, website, facebook, isDigital, hasDPlus, hasHIS, isShareholder, assignedTo, dPlusContractDate, dPlusStatus, managementCompany } = req.body;
   await Client.findByIdAndUpdate(req.params.id, {
     name, phone, address, owner, contactPerson, notes,
-    institutionCode, city, district, website, facebook,
+    institutionCode, city, district, website, facebook, managementCompany,
     isDigital: isDigital === 'on', hasDPlus: hasDPlus === 'on', hasHIS: hasHIS === 'on', isShareholder: isShareholder === 'on',
     dPlusContractDate: dPlusContractDate || null,
     dPlusStatus: dPlusStatus || '',

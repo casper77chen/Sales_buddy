@@ -91,8 +91,11 @@ async function main() {
       if (match.hasDPlus) {
         stats.alreadyDPlus++;
         results.alreadyDPlus.push(match.name);
-        if (!DRY_RUN && contractDate && !match.dPlusContractDate) {
-          await Client.findByIdAndUpdate(match._id, { dPlusContractDate: contractDate });
+        if (!DRY_RUN) {
+          const patch = {};
+          if (contractDate && !match.dPlusContractDate) patch.dPlusContractDate = contractDate;
+          if (clinic.managementCompany && !match.managementCompany) patch.managementCompany = clinic.managementCompany;
+          if (Object.keys(patch).length > 0) await Client.findByIdAndUpdate(match._id, patch);
         }
       } else {
         stats.updated++;
@@ -101,6 +104,7 @@ async function main() {
         if (!DRY_RUN) {
           const update = { hasDPlus: true };
           if (contractDate) update.dPlusContractDate = contractDate;
+          if (clinic.managementCompany) update.managementCompany = clinic.managementCompany;
           await Client.findByIdAndUpdate(match._id, update);
         }
       }
@@ -114,6 +118,7 @@ async function main() {
         city: clinic.city || undefined,
         district: clinic.district || undefined,
         dPlusContractDate: contractDate,
+        managementCompany: clinic.managementCompany || undefined,
       };
       results.created.push(newClient);
 
