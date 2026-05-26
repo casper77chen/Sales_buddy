@@ -47,25 +47,21 @@ router.delete('/users/:id', ensureAuthenticated, ensureAdmin, async (req, res) =
 
 // ============ d+ 客戶匯入 ============
 
-// 預覽 (dry run)
+// 匯入頁面
 router.get('/import-dplus', ensureAuthenticated, ensureAdmin, async (req, res) => {
-  try {
-    const importData = require('../scripts/dplus-import-data.json');
-    const result = await runDPlusImport(importData, true);
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  res.render('admin/import-dplus', { result: null, executed: false });
 });
 
-// 執行匯入
+// 預覽 or 執行
 router.post('/import-dplus', ensureAuthenticated, ensureAdmin, async (req, res) => {
   try {
     const importData = require('../scripts/dplus-import-data.json');
-    const result = await runDPlusImport(importData, false);
-    res.json(result);
+    const dryRun = req.body.action === 'preview';
+    const result = await runDPlusImport(importData, dryRun);
+    res.render('admin/import-dplus', { result, executed: !dryRun });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    req.flash('error_msg', '匯入失敗：' + err.message);
+    res.redirect('/admin/import-dplus');
   }
 });
 

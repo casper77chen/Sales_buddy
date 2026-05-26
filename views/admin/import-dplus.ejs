@@ -1,0 +1,107 @@
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+    <div class="card mt-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-cloud-upload"></i> d+ 客戶匯入（430 筆）</span>
+        <a href="/admin" class="btn btn-sm btn-outline-secondary">返回管理</a>
+      </div>
+      <div class="card-body">
+        <% if (!result) { %>
+          <p>此工具會將 Excel 中 430 筆 d+ 客戶資料匯入系統：</p>
+          <ul>
+            <li>以診所名稱比對現有客戶，比對到的標記 <strong>hasDPlus = true</strong></li>
+            <li>同時寫入 <strong>d+ 合約日期</strong>（啟動時間）與<strong>管理公司</strong></li>
+            <li>比對不到的自動新建客戶</li>
+          </ul>
+          <div class="d-flex gap-2">
+            <form method="POST" action="/admin/import-dplus">
+              <input type="hidden" name="action" value="preview">
+              <button type="submit" class="btn btn-outline-primary"><i class="bi bi-eye"></i> 預覽（不寫入）</button>
+            </form>
+          </div>
+
+        <% } else if (!executed) { %>
+          <div class="alert alert-info"><i class="bi bi-info-circle"></i> 以下為預覽結果，尚未寫入資料庫</div>
+
+          <h5>統計</h5>
+          <table class="table table-sm w-auto">
+            <tr><td>Excel 總筆數</td><td class="fw-bold"><%= result.stats.total %></td></tr>
+            <tr><td>比對成功（已存在）</td><td class="fw-bold"><%= result.stats.matched %></td></tr>
+            <tr><td class="ps-4">- 已是 d+ 客戶</td><td><%= result.stats.alreadyDPlus %></td></tr>
+            <tr><td class="ps-4">- 將標記為 d+</td><td class="text-success fw-bold"><%= result.stats.updated %></td></tr>
+            <tr><td class="ps-4">- 模糊比對</td><td><%= result.stats.fuzzyMatched %></td></tr>
+            <tr><td>將新建客戶</td><td class="text-primary fw-bold"><%= result.stats.created %></td></tr>
+          </table>
+
+          <% if (result.details.fuzzyMatched.length > 0) { %>
+            <h5 class="mt-4">模糊比對（請確認）</h5>
+            <table class="table table-sm table-bordered">
+              <thead><tr><th>Excel 名稱</th><th>比對到的 DB 名稱</th><th>原始資料</th></tr></thead>
+              <tbody>
+                <% result.details.fuzzyMatched.forEach(f => { %>
+                  <tr><td><%= f.excel %></td><td><%= f.db %></td><td><small class="text-muted"><%= f.raw %></small></td></tr>
+                <% }) %>
+              </tbody>
+            </table>
+          <% } %>
+
+          <% if (result.details.updated.length > 0) { %>
+            <h5 class="mt-4">將更新為 d+ 的客戶（<%= result.details.updated.length %> 筆）</h5>
+            <div style="max-height:200px;overflow-y:auto;">
+              <table class="table table-sm">
+                <tbody>
+                  <% result.details.updated.forEach(u => { %>
+                    <tr><td><%= u.name %></td><td><span class="badge bg-secondary"><%= u.method %></span></td></tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+
+          <% if (result.details.created.length > 0) { %>
+            <h5 class="mt-4">將新建的客戶（<%= result.details.created.length %> 筆）</h5>
+            <div style="max-height:300px;overflow-y:auto;">
+              <table class="table table-sm">
+                <thead><tr><th>名稱</th><th>縣市</th><th>行政區</th><th>管理公司</th></tr></thead>
+                <tbody>
+                  <% result.details.created.forEach(c => { %>
+                    <tr>
+                      <td><%= c.name %></td>
+                      <td><%= c.city || '-' %></td>
+                      <td><%= c.district || '-' %></td>
+                      <td><%= c.managementCompany || '-' %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+
+          <hr>
+          <div class="d-flex gap-2 mt-3">
+            <form method="POST" action="/admin/import-dplus">
+              <input type="hidden" name="action" value="execute">
+              <button type="submit" class="btn btn-success" onclick="return confirm('確定要執行匯入嗎？此操作無法復原。')">
+                <i class="bi bi-check-circle"></i> 確認執行匯入
+              </button>
+            </form>
+            <a href="/admin/import-dplus" class="btn btn-outline-secondary">取消</a>
+          </div>
+
+        <% } else { %>
+          <div class="alert alert-success"><i class="bi bi-check-circle"></i> 匯入完成！</div>
+
+          <h5>結果</h5>
+          <table class="table table-sm w-auto">
+            <tr><td>比對成功（已存在）</td><td class="fw-bold"><%= result.stats.matched %></td></tr>
+            <tr><td class="ps-4">- 已是 d+ 客戶</td><td><%= result.stats.alreadyDPlus %></td></tr>
+            <tr><td class="ps-4">- 新標記為 d+</td><td class="text-success fw-bold"><%= result.stats.updated %></td></tr>
+            <tr><td>新建客戶</td><td class="text-primary fw-bold"><%= result.stats.created %></td></tr>
+          </table>
+
+          <a href="/clients" class="btn btn-primary mt-2"><i class="bi bi-list"></i> 查看客戶列表</a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
