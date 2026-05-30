@@ -73,5 +73,20 @@ app.get('/guide', (req, res) => {
 const { startCalendarSync } = require('./config/calendar-sync');
 startCalendarSync();
 
+// Dashboard pending count API
+const User = require('./models/User');
+app.get('/api/dashboard/pending', async (req, res) => {
+  const key = req.query.key;
+  if (key !== (process.env.DASHBOARD_API_KEY || 'casper-dash-2025')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const count = await User.countDocuments({ isApproved: false });
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`伺服器啟動於 http://localhost:${PORT}`));
