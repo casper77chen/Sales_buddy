@@ -86,9 +86,7 @@ app.get('/api/dashboard/pending', async (req, res) => {
   const auth = req.headers.authorization || '';
   const bearer = /^Bearer\s+/i.test(auth) ? auth.replace(/^Bearer\s+/i, '') : '';
   const bearerOk = !!expected && !!bearer && dashSafeEqual(bearer, expected);
-  // 過渡期相容：舊 ?key= 只認舊字面值；車隊全面切 Bearer 後移除此分支
-  const legacyOk = req.query.key === 'casper-dash-2025';
-  if (!bearerOk && !legacyOk) return res.status(401).json({ error: 'Unauthorized' });
+  if (!bearerOk) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const count = await User.countDocuments({ isApproved: false });
     res.json({ count });
