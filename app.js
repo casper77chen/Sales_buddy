@@ -95,5 +95,84 @@ app.get('/api/dashboard/pending', async (req, res) => {
   }
 });
 
+// 戰情室同步用唯讀匯出 API（Bearer EXPORT_API_KEY，模式同 dashboard pending）
+function exportAuthOk(req) {
+  const expected = process.env.EXPORT_API_KEY;
+  const auth = req.headers.authorization || '';
+  const bearer = /^Bearer\s+/i.test(auth) ? auth.replace(/^Bearer\s+/i, '') : '';
+  return !!expected && !!bearer && dashSafeEqual(bearer, expected);
+}
+
+app.get('/api/export/clients', async (req, res) => {
+  if (!exportAuthOk(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const Client = require('./models/Client');
+    const clients = await Client.find().populate('assignedTo', 'name').lean();
+    res.json({
+      count: clients.length,
+      clients: clients.map(c => ({
+        id: String(c._id),
+        institutionCode: c.institutionCode || null,
+        name: c.name,
+        phone: c.phone || null,
+        address: c.address || null,
+        city: c.city || null,
+        district: c.district || null,
+        website: c.website || null,
+        facebook: c.facebook || null,
+        isDigital: !!c.isDigital,
+        hasDPlus: !!c.hasDPlus,
+        dPlusContractDate: c.dPlusContractDate || null,
+        dPlusStatus: c.dPlusStatus || null,
+        hasHIS: !!c.hasHIS,
+        isShareholder: !!c.isShareholder,
+        managementCompany: c.managementCompany || null,
+        owner: c.owner || null,
+        contactPerson: c.contactPerson || null,
+        notes: c.notes || null,
+        assignedToName: c.assignedTo ? c.assignedTo.name : null,
+        createdAt: c.createdAt || null,
+      })),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/export/visits', async (req, res) => {
+  if (!exportAuthOk(req)) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const Visit = require('./models/Visit');
+    const query = {};
+    if (req.query.since) {
+      const since = new Date(req.query.since);
+      if (!isNaN(since)) query.updatedAt = { $gte: since };
+    }
+    const visits = await Visit.find(query)
+      .populate('salesRep', 'name')
+      .populate('client', 'name institutionCode')
+      .lean();
+    res.json({
+      count: visits.length,
+      visits: visits.map(v => ({
+        id: String(v._id),
+        clientId: v.client ? String(v.client._id) : null,
+        clientName: v.client ? v.client.name : null,
+        clientInstitutionCode: v.client ? (v.client.institutionCode || null) : null,
+        date: v.date,
+        timeSlot: v.timeSlot || null,
+        status: v.status,
+        contactPerson: v.contactPerson || null,
+        content: v.content || null,
+        followUp: v.followUp || null,
+        salesRepName: v.salesRep ? v.salesRep.name : null,
+        updatedAt: v.updatedAt || v.createdAt || null,
+      })),
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`伺服器啟動於 http://localhost:${PORT}`));
