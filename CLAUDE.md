@@ -47,3 +47,8 @@ routes/     - auth, dashboard, visits, clients, mileage, manager, admin, api
 views/      - EJS templates (layouts, partials, feature pages)
 public/     - CSS, JS, uploads
 ```
+
+## 戰情室整合（2026-07-28）
+- 新增唯讀匯出 API（app.js 底部）：GET /api/export/clients、GET /api/export/visits?since=ISO，認證 `Authorization: Bearer $EXPORT_API_KEY`
+- 供「台灣牙科戰情室」（dentcrm-tw.zeabur.app）每日同步拉取；改 Client/Visit schema 時注意這兩支的欄位映射
+- 本日已把 git trigger 綁回（push main 自動部署，GraphQL updateGitTrigger）
